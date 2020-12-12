@@ -1,0 +1,16 @@
+{
+    "name": "DOHackaton",
+    "version": "1.0.0",
+    "description": "A project on APP platform!",
+    "main": "src/server.js",
+    "scripts": {
+        "start": "node src/server.js"
+    },
+    "author": "Denislav Gavrilov",
+    "license": "ISC",
+    "dependencies": {
+        "express": "^4.15.1",
+        "serve": "^11.3.2",
+        "socket.io": "^2.3.0"
+    }
+}

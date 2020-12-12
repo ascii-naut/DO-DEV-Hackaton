@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
+      integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="./../assets/css/main.css" />
+    <script
+      src="https://kit.fontawesome.com/16b983e4de.js"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+
+  <body>
+    <main>
+      <section id="gameSection">
+        <div class="container text-center align-content-center">
+          <h3 class="timer"
+            style="
+              left: 20px;
+              top: 10px;
+              border-right: 2px solid black;
+              border-bottom: 2px solid black;
+              padding: 0 15px 10px 0px;
+              position: fixed;
+              font-weight: 800;
+            "
+          >
+            Time Left: <span style="color: rgb(231, 68, 68);">10s</span>
+          </h3>
+          <div class="row" style="height: 100px"></div>
+          <div class="row justify-content-center" id="playerCol">
+
+          </div>
+          <div class="row justify-content-center pt-5 w-50 m-auto">
+            <h3 class="font-weight-bold mb-4" style="font-size: 40px">
+              There's been a murder!
+            </h3>
+            <p class="pb-5" style="font-weight: 500">
+              It was all good in the depths of the ocean. However, it seems
+              there's a psycho shark among us. Somebody with no remorse
+              whatsoever! This resulted in a murder this night. Solve the crime
+              together and put that nasty shark behind coral bars!
+            </p>
+            <span id="bottomPlayer">
+              <!-- BOTTOM PLAYER HERE -->
+              <button id="testUpdate" onclick="updateFun()">Update</button>
+            </span>
+          </div>
+          <div class="row justify-content-center">
+            <button
+              id="playerCard"
+              style="
+                padding: 0;
+                position: fixed;
+                border-radius: 10px;
+                bottom: -200px;
+              "
+            >
+              <img
+                src="assets/img/pixel-3.jpg"
+                width="300"
+                height="400"
+                alt=""
+              />
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+      integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+      integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js"
+      integrity="sha384-w1Q4orYjBQndcko6MimVbzY0tgp4pWB4lZ7lr30WKz0vr/aWKhXdBNmNb5D92v7s"
+      crossorigin="anonymous"
+    ></script>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script
+      src="/assets/js/app.js"
+      charset="utf-8"
+      type="text/javascript"
+    ></script>
+    <script
+      src="/assets/js/default.js"
+      charset="utf-8"
+      type="text/javascript"
+    ></script>
+    <!-- <script>
+      var socket = io();
+    </script> -->
+  </body>
+</html>

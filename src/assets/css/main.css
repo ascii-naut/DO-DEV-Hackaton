@@ -1,0 +1,48 @@
+.playerCardShow {
+    animation: .5s showPlayerCard forwards;
+}
+.playerCardHide {
+    animation: .5s hidePlayerCard forwards;
+}
+
+.killPlayer {
+    transform: scale(1.2);
+    background-color: rgb(32, 32, 32);
+    color: rgb(255, 121, 121);
+}
+
+.savePlayer {
+    transform: scale(1.2);
+    background-color: rgb(226, 89, 89);
+    color: white;
+}
+
+.playerButton {
+    border: 3px solid black;
+    border-radius: 10px;
+    padding: 0;
+    width: 100px;
+    height: 100px;
+}
+
+@media screen and (min-width: 750px) {
+    .playerCol-1 {
+        top: 60px
+    }
+    .playerCol-2 {
+        top: 20px
+    }
+    .playerCol-3 {
+        top: -20px
+    }
+}
+
+@keyframes showPlayerCard {
+    0% {bottom: -200px}
+    100% {bottom: -50px}
+}
+
+@keyframes hidePlayerCard {
+    0% {bottom: -50px}
+    100% {bottom: -200px}
+}
