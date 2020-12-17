@@ -2,16 +2,19 @@ let socket = io();
 let startButton = document.getElementById("startButton");
 let loginSection = document.getElementById("loginSection");
 let gameSection = document.getElementById("gameSection");
-
 let updateButton = document.getElementById("testUpdate");
-
-roleA = 0;
+let killerCard = document.getElementById('killerCard');
+let medicCard = document.getElementById('medicCard');
+let passangerCard = document.getElementById('passangerCard');
+let allPlayers = document.getElementsByClassName('player');
+let timer = document.getElementById('timer');
+rounds = 0;
+roleA = "Passanger";
 
 socket.on("connect", function() {
 
     let searchQuery = window.location.search.substring(1);
     params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
-
 
     socket.emit('join', params, roleA, function(err) {
         if (err) {
@@ -20,7 +23,7 @@ socket.on("connect", function() {
         }
         else {
             console.log('No error.');
-            roleA++;
+            console.log(roleA);
         }
 
     })
@@ -28,89 +31,157 @@ socket.on("connect", function() {
 
 socket.on("updateUserList", (users) => {
     let players = document.getElementById('playerCol');
-    
 
     for(let i = 0; i < users.length-1; i++) {
-        let playerButton = document.createElement("BUTTON");
         let playerDiv = document.createElement("DIV");
+        let playerButton = document.createElement("BUTTON");
+        let playerName = document.createElement("DIV");
+
         playerDiv.classList.add("col");
         playerButton.classList.add("playerButton");
+        playerButton.classList.add("player");
+        playerName.innerHTML = users[i];
+
         playerDiv.appendChild(playerButton);
+        playerDiv.appendChild(playerName);
         players.appendChild(playerDiv);
-        console.log(users[i]);
     }
 });
 
-// socket.on("updateUserRole", (roles) => {
-//     // let isKiller = false;
-//     // let isMedic = false;
-//     // let playerRole = [];
-
-//     // for(let i = 0; i <= roles.length; i++) {
-//     //     let random = Math.floor(Math.random() * 3)
-//     //     if (random == 0 && !isKiller) {
-//     //         playerRole[i] = "Killer";
-//     //         isKiller = true;
-//     //     }
-//     //     else if (random == 1 && !isMedic) {
-//     //         playerRole[i] = "Medic";
-//     //         isMedic = true;
-//     //     }
-//     //     else {
-//     //         playerRole[i] = "Passanger";
-//     //     }
-//     //     console.log(playerRole[i]);
-//     //     socket.emit("getThis", (playerRole[i]));
-//     // }
-
-//     // for(let i=0; i<roles.length-1; i++) {
-//     //     console.log(roles[1]);
-//     // }
-
-//     roles.forEach((role) => {
-//         console.log(role);
-//     })
-// })
-
-function hideLogin() {
-  loginSection.style.display = "none";
-  gameSection.style.display = "block";
-}
-
-socket.on("updateUserRole", (roles) => {
-
-    let isKiller = false;
-    let isMedic = false;
-    let playerRole = [];
-
-    for(let i = 0; i < roles.length; i++) {
-        let random = Math.floor(Math.random() * 3)
-        if (random == 0 && !isKiller) {
-            playerRole[i] = "Killer";
-            isKiller = true;
-        }
-        else if (random == 1 && !isMedic) {
-            playerRole[i] = "Medic";
-            isMedic = true;
-        }
-        else {
-            playerRole[i] = "Passanger";
-        }
+socket.on("updateUserRole", () => {
+    for(let i = 0; i<allPlayers.length; i++) {
+        allPlayers[i].addEventListener('click', clickOnPlayer);
     }
-    for(let a = 0; a < playerRole.length-1; a++) {
-        roles[a] = playerRole[a];
-        console.log(roles[a]);
-    }
-    })
+})
 
-function updateFun() {
+function startGame() {
     let searchQuery = window.location.search.substring(1);
     params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
 
-    let isKiller = false;
-    let isMedic = false;
-    let playerRole = [];
-
-    socket.emit("testUpdate", params, playerRole);
-    console.log("it works!");
+    socket.emit("startGame", params);
 }
+
+socket.on('timerStart', () => {
+    timerStart();
+})
+
+
+socket.on('blackScreen', () => {
+    let blackScreen = document.getElementById('blackScreen');
+    blackScreen.classList.remove("hideBlackScreen");
+    blackScreen.classList.add("showBlackScreen");
+})
+socket.on('whiteScreen', () => {
+    let blackScreen = document.getElementById('blackScreen');
+    blackScreen.classList.remove("showBlackScreen");
+    blackScreen.classList.add("hideBlackScreen");
+})
+socket.on('passangerCard', () => {
+    killerCard.style.display = "none";
+    medicCard.style.display = "none";
+    passangerCard.style.display = "block";
+})
+socket.on('killerCard', () => {
+    killerCard.style.display = "block";
+    medicCard.style.display = "none";
+    passangerCard.style.display = "none";
+})
+socket.on('medicCard', () => {
+    killerCard.style.display = "none";
+    medicCard.style.display = "block";
+    passangerCard.style.display = "none";
+})
+
+function startRoundKiller() {
+    socket.emit("blackScreenPassanger");
+    socket.emit("blackScreenMedic");
+    socket.emit("whiteScreenKiller");
+    socket.emit('updateRounds', rounds);
+}
+
+function startRoundMedic() {
+    socket.emit("blackScreenKiller");
+    socket.emit("blackScreenPassanger");
+    socket.emit("whiteScreenMedic");
+    socket.emit('updateRounds', rounds);
+}
+
+function startRoundPassanger() {
+    socket.emit("whiteScreenPassanger");
+    socket.emit("whiteScreenKiller");
+    socket.emit("whiteScreenMedic");
+    socket.emit('updateRounds', rounds);
+}
+
+socket.on('newRounds', (newRounds) => {
+    rounds = newRounds;
+    console.log(rounds);
+    timerStart();
+})
+function timerStart() {
+
+    if(rounds == 0) {
+        let a = setInterval(function () {
+            timer.innerHTML -= 1;
+            if(timer.innerHTML == 0) {
+                clearInterval(a);
+                timer.innerHTML = 10;
+                startRoundKiller();
+            }
+        }, 1000);
+    }
+    else if(rounds == 1) {
+        let b = setInterval(function () {
+            timer.innerHTML -= 1;
+            if(timer.innerHTML == 0) {
+                clearInterval(b);
+                timer.innerHTML = 7;
+                startRoundMedic();
+            }
+        }, 1000);
+    }
+    else if(rounds == 2) {
+        let c = setInterval(function () {
+            timer.innerHTML -= 1;
+            if(timer.innerHTML == 0) {
+                clearInterval(c);
+                timer.innerHTML = 5;
+                startRoundPassanger();
+            }
+        }, 1000);
+    }
+}
+
+
+socket.on('killPlayer', () => {
+    for(let i = 0; i<allPlayers.length; i++) {
+        allPlayers[i].addEventListener('click', showIcon);
+    }
+    function showIcon() {
+        this.classList.add("fa");
+        this.classList.add("fa-skull-crossbones");
+        for(let a = 0; a<allPlayers.length; a++) {
+            allPlayers[a].style.pointerEvents = "none";
+        }
+    }
+})
+
+
+
+function clickOnPlayer() {
+    socket.emit('clickOnPlayer');
+}
+
+
+
+
+function killerScreen() {
+    let searchQuery = window.location.search.substring(1);
+    params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
+
+    socket.emit('killerScreen', params);
+}
+
+socket.on('killerScreen', (data) => {
+    console.log(data);
+})

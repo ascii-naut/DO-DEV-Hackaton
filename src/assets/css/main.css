@@ -25,6 +25,23 @@
     height: 100px;
 }
 
+.showBlackScreen {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    z-index: 20;
+    pointer-events: all;
+    animation: 2s blackScreen forwards;
+}
+.hideBlackScreen {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    z-index: 20;
+    pointer-events: none;
+    animation: 2s whiteScreen forwards;
+}
+
 @media screen and (min-width: 750px) {
     .playerCol-1 {
         top: 60px
@@ -45,4 +62,14 @@
 @keyframes hidePlayerCard {
     0% {bottom: -50px}
     100% {bottom: -200px}
+}
+
+@keyframes blackScreen {
+    0% {background-color: rgba(0, 0, 0, 0);}
+    100% {background-color: black;}
+}
+
+@keyframes whiteScreen {
+    0% {background-color: rgb(0, 0, 0);}
+    100% {background-color: rgba(0, 0, 0, 0);}
 }

@@ -20,6 +20,7 @@
 
   <body>
     <main>
+      <div id="blackScreen"></div>
       <section id="gameSection">
         <div class="container text-center align-content-center">
           <h3 class="timer"
@@ -33,7 +34,7 @@
               font-weight: 800;
             "
           >
-            Time Left: <span style="color: rgb(231, 68, 68);">10s</span>
+            Time Left: <span id="timer" style="color: rgb(231, 68, 68);">10</span>s
           </h3>
           <div class="row" style="height: 100px"></div>
           <div class="row justify-content-center" id="playerCol">
@@ -51,7 +52,7 @@
             </p>
             <span id="bottomPlayer">
               <!-- BOTTOM PLAYER HERE -->
-              <button id="testUpdate" onclick="updateFun()">Update</button>
+              <button id="testUpdate" onclick="startGame()">Start Game</button>
             </span>
           </div>
           <div class="row justify-content-center">
@@ -63,12 +64,30 @@
                 border-radius: 10px;
                 bottom: -200px;
               "
-            >
+              >
               <img
                 src="assets/img/pixel-3.jpg"
                 width="300"
                 height="400"
                 alt=""
+                id="killerCard"
+                style="display: none;"
+              />
+              <img
+                src="assets/img/pixel-2.jpg"
+                width="300"
+                height="400"
+                alt=""
+                id="medicCard"
+                style="display: none;"
+              />
+              <img
+                src="assets/img/pixel-1.png"
+                width="300"
+                height="400"
+                alt=""
+                id="passangerCard"
+                style="display: none;"
               />
             </button>
           </div>
