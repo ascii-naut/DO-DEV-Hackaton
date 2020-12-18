@@ -11,13 +11,13 @@ server.listen(port, ()=> {
   console.log(`Server is up on port ${port}.`)
 });
 
-
+let isDeadUser = "";
+let isHealedUser = "";
 
 
 
 const {isRealString} = require('./assets/js/utils/isRealString')
 const {Users} = require('./assets/js/utils/users');
-const { SSL_OP_EPHEMERAL_RSA } = require('constants');
 
 let users = new Users();
 io.on('connection', (socket) => {
@@ -71,21 +71,49 @@ io.on('connection', (socket) => {
     }
     else if(user.role == "Medic"){
       console.log("MEDIC");
+      socket.emit('healPlayer');
     }
     
     else if(user.role == "Passanger"){
       console.log("PASSANGER");
+      socket.emit('passPlayer');
+    }
+  })
+  socket.on('isKilled', (clickedUser) => {
+    users.isAlive(clickedUser, "isDead");
+    isDeadUser = clickedUser;
+  })
+  socket.on('isHealed', (clickedUser) => {
+    users.isAlive(clickedUser, "isHealed");
+  })
+
+
+
+
+
+  socket.on('endRound', () => {
+    let dead = "isDead";
+    let healed = "isHealed";
+
+    let deadUser = users.getUserAlive(dead);
+    let healedUser = users.getUserAlive(healed);
+
+    for (let i = 0; i<1; i++) {
+      io.to(deadUser[i].id).emit('testDeath');
+      io.to(deadUser[i].room).emit('updateDeadUser', isDeadUser);
     }
   })
 
 
 
-  socket.on('killerScreen', () => {
+
+
+
+  socket.on('testRole', () => {
     // let user = users.getUserList(params.room);
     let user = users.getUser(socket.id);
-    io.to(user.room).emit('killerScreen', users.getUser(socket.id));
+    io.to(user.room).emit('testRole', users.getUser(socket.id));
   })
-
   socket.on('blackScreenPassanger', () => {
     let userList = users.getUserRoles("Passanger");
     for(let i = 0; i<userList.length; i++) {

@@ -3,8 +3,8 @@ class Users {
         this.users = [];
     }
 
-    addUser(id, name, room, role) {
-        let user = {id, name, room, role};
+    addUser(id, name, room, role, alive) {
+        let user = {id, name, room, role, alive};
         this.users.push(user);
         return user;
     }
@@ -31,40 +31,19 @@ class Users {
         role1 = "Killer";
         role2 = "Medic";
 
-        if(random1 != random2) {
-            let user = this.users[random1];
-            let user2 = this.users[random2];
-            user.role = role1;
-            user2.role = role2;
-            return user, user2
-        }
-        else {
-            if(random1==this.users.length){
-                random1--;
-                let user = this.users[random1];
-                let user2 = this.users[random2];
-                user.role = role1;
-                user2.role = role2;
-                return user, user2
-            }
-            else if(random1==0) {
-                random1++;
-                let user = this.users[random1];
-                let user2 = this.users[random2];
-                user.role = role1;
-                user2.role = role2;
-                return user, user2
-            }
-            else {
-                random1--;
-                let user = this.users[random1];
-                let user2 = this.users[random2];
-                user.role = role1;
-                user2.role = role2;
-                return user, user2
-            }
+        let user = this.users[0];
+        let user2 = this.users[1];
+        user.role = role1;
+        user2.role = role2;
 
-        }
+        // console.log(random1 + " ------ " + random2 );
+        // console.log(this.users.length);
+    }
+
+    isAlive(playerName, status) {
+        let user = this.users.filter((user) => user.name === playerName)[0];
+        user.alive = status;
+        return user;
     }
 
     getUser(id) {
@@ -72,10 +51,11 @@ class Users {
     }
 
     getUserRoles (role) {
-        // let users = this.users.filter((user) => user.room === room && user.role == role);
-        // return users;
-
         return this.users.filter((user) => user.role === role);
+    }
+
+    getUserAlive (alive) {
+        return this.users.filter((user) => user.alive === alive);
     }
     
 }
