@@ -8,7 +8,7 @@ let medicCard = document.getElementById('medicCard');
 let passangerCard = document.getElementById('passangerCard');
 let allPlayers = document.getElementsByClassName('player');
 let timer = document.getElementById('timer');
-rounds = 0;
+rounds = 20;
 roleA = "Passanger";
 
 socket.on("connect", function() {
@@ -30,7 +30,7 @@ socket.on("connect", function() {
 });
 socket.on("updateUserList", (users) => {
     let players = document.getElementById('playerCol');
-    let colors = ["red", "blue", "black", "yellow", "green"]
+    //let colors = ["red", "blue", "black", "yellow", "green"]
 
     for(let i = 0; i < users.length-1; i++) {
         let playerDiv = document.createElement("DIV");
@@ -43,7 +43,7 @@ socket.on("updateUserList", (users) => {
         // playerButton.classList.add(users[i]);
         playerButton.id = users[i];
         playerName.innerHTML = users[i];
-        playerButton.style.backgroundColor = colors[i];
+        //playerButton.style.backgroundColor = colors[i];
 
         playerDiv.appendChild(playerButton);
         playerDiv.appendChild(playerName);
@@ -74,7 +74,37 @@ socket.on('killPlayer', () => {
     for(let i = 0; i<allPlayers.length; i++) {
         allPlayers[i].addEventListener('click', showIcon);
     }
+    function showIcon() {
+        let clickedUser = this.id;
+        this.classList.add("fa");
+        this.classList.add("fa-skull-crossbones");
+        this.style.pointerEvents = "none";
+        for(let a = 0; a<allPlayers.length; a++) {
+            allPlayers[a].style.pointerEvents = "none";
+        }
+        console.log(clickedUser);
+        socket.emit('isKilled', clickedUser);
+    }
 })
+
+socket.on('testDeath', () => {
+    window.alert('YOU ARE DEAD :XXX');
+})
+socket.on('updateDeadUser', (data) => {
+    let a = document.getElementById(data);
+    a.classList.remove('fa-skull-crossbones');
+    a.classList.remove('player');
+    a.classList.add('fa');
+    a.classList.add('fa-3x');
+    a.classList.add('fa-skull-crossbones');
+    a.style.pointerEvents = "none";
+})
+
+
+
+
+
+
 socket.on('healPlayer', () => {
     for(let i = 0; i<allPlayers.length; i++) {
         allPlayers[i].addEventListener('click', showIcon);
@@ -83,7 +113,6 @@ socket.on('healPlayer', () => {
         let clickedUser = this.id;
         this.classList.add("fa");
         this.classList.add("fa-heart");
-        this.classList.remove("player");
         this.style.pointerEvents = "none";
         for(let a = 0; a<allPlayers.length; a++) {
             allPlayers[a].style.pointerEvents = "none";
@@ -92,25 +121,13 @@ socket.on('healPlayer', () => {
         socket.emit('isHealed', clickedUser);
     }
 })
-socket.on('passPlayer', () => {
-    for(let i = 0; i<allPlayers.length; i++) {
-        allPlayers[i].style.pointerEvents = "none";
-    }
-})
+// socket.on('passPlayer', () => {
+//     for(let i = 0; i<allPlayers.length; i++) {
+//         allPlayers[i].style.pointerEvents = "none";
+//     }
+// })
 function clickOnPlayer() {
     socket.emit('clickOnPlayer');
-}
-function showIcon() {
-    let clickedUser = this.id;
-    this.classList.add("fa");
-    this.classList.add("fa-skull-crossbones");
-    this.classList.remove("player");
-    this.style.pointerEvents = "none";
-    for(let a = 0; a<allPlayers.length; a++) {
-        allPlayers[a].style.pointerEvents = "none";
-    }
-    console.log(clickedUser);
-    socket.emit('isKilled', clickedUser);
 }
 
 
@@ -118,18 +135,20 @@ function showIcon() {
 function endRound() {
     socket.emit('endRound');
 }
-socket.on('testDeath', () => {
-    window.alert('YOU ARE DEAD :XXX');
-})
-socket.on('updateDeadUser', (data) => {
-    let a = document.getElementById(data);
-    a.classList.remove('fa-skull-crossbones')
-    a.classList.add('fa');
-    a.classList.add('fa-3x');
-    a.classList.add('fa-skull-crossbones');
-    a.style.pointerEvents = "none";
-})
 
+function clearRoom() {
+    for (let i = 0; i<allPlayers.length; i++) {
+        allPlayers[i].classList.remove('fa');
+        allPlayers[i].classList.remove('fa-3x');
+        allPlayers[i].classList.remove('fa-skull-crossbones');
+        allPlayers[i].classList.remove('fa-heart');
+        allPlayers[i].style.pointerEvents = "all";
+    }
+}
+
+socket.on('clearRoom', () => {
+    clearRoom();
+})
 
 
 
@@ -191,9 +210,9 @@ function startRoundPassanger() {
     socket.emit('updateRounds', rounds);
     endRound();
 
-    for(let i = 0; i<allPlayers.length; i++) {
-        allPlayers[i].style.pointerEvents = "all";
-    }
+    // for(let i = 0; i<allPlayers.length; i++) {
+    //     allPlayers[i].style.pointerEvents = "all";
+    // }
 }
 socket.on('newRounds', (newRounds) => {
     rounds = newRounds;

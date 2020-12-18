@@ -74,10 +74,10 @@ io.on('connection', (socket) => {
       socket.emit('healPlayer');
     }
     
-    else if(user.role == "Passanger"){
-      console.log("PASSANGER");
-      socket.emit('passPlayer');
-    }
+    // else if(user.role == "Passanger"){
+    //   console.log("PASSANGER");
+    //   socket.emit('passPlayer');
+    // }
   })
   socket.on('isKilled', (clickedUser) => {
     users.isAlive(clickedUser, "isDead");
@@ -98,9 +98,18 @@ io.on('connection', (socket) => {
     let deadUser = users.getUserAlive(dead);
     let healedUser = users.getUserAlive(healed);
 
-    for (let i = 0; i<1; i++) {
-      io.to(deadUser[i].id).emit('testDeath');
-      io.to(deadUser[i].room).emit('updateDeadUser', isDeadUser);
+    if(deadUser.length >= 1) {
+      for (let i = 0; i<1; i++) {
+        io.to(deadUser[i].id).emit('testDeath');
+        io.to(deadUser[i].room).emit('updateDeadUser', isDeadUser);
+        io.to(healedUser[i].room).emit('clearRoom');
+        deadUser[i].alive = "alreadyDead";
+      }
+    }
+    else if (healedUser.length >= 1) {
+      for (let i = 0; i<1; i++) {
+        io.to(healedUser[i].room).emit('clearRoom');
+      }
     }
   })
 
