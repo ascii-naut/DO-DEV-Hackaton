@@ -25,14 +25,29 @@ class Users {
         return namesArray;
     }
 
-    updateUserListRoles (role1, role2) {
+    updateUserVote (room, vote, clickedUser) {
+        let user = this.users.filter((user) => user.room === room && user.id === clickedUser.id)[0];
+        user.alive = vote;
+        return user;
+    }
+
+    getUserVote(room, name) {
+        let user = this.users.filter((user) => user.room === room && user.name === name)[0];
+        let vote = user.alive;
+        return vote;
+        //return user;
+    }
+
+    updateUserListRoles (room, role1, role2) {
         let random1 = Math.floor(Math.random() * this.users.length);
         let random2 = Math.floor(Math.random() * this.users.length);
         role1 = "Killer";
         role2 = "Medic";
 
-        let user = this.users[0];
-        let user2 = this.users[1];
+        // let user = this.users[0];
+        // let user2 = this.users[1];
+        let user = this.users.filter((user) => user.room === room)[0];
+        let user2 = this.users.filter((user) => user.room === room)[1];
         user.role = role1;
         user2.role = role2;
 
@@ -40,8 +55,8 @@ class Users {
         // console.log(this.users.length);
     }
 
-    isAlive(playerName, status) {
-        let user = this.users.filter((user) => user.name === playerName)[0];
+    isAlive(playerName, status, room) {
+        let user = this.users.filter((user) => user.name === playerName && user.room === room)[0];
         user.alive = status;
         return user;
     }
@@ -50,12 +65,12 @@ class Users {
         return this.users.filter((user) => user.id === id)[0];
     }
 
-    getUserRoles (role) {
-        return this.users.filter((user) => user.role === role);
+    getUserRoles (role, room) {
+        return this.users.filter((user) => user.role === role && user.room === room);
     }
 
-    getUserAlive (alive) {
-        return this.users.filter((user) => user.alive === alive);
+    getUserAlive (alive, room) {
+        return this.users.filter((user) => user.alive === alive && user.room === room);
     }
     
 }

@@ -13,6 +13,8 @@ server.listen(port, ()=> {
 
 let isDeadUser = "";
 let isHealedUser = "";
+let isVoted = 0;
+let saveVote = [];
 
 
 
@@ -30,7 +32,7 @@ io.on('connection', (socket) => {
     socket.join(params.room)
 
     users.removeUser(socket.id);
-    users.addUser(socket.id, params.name, params.room, role);
+    users.addUser(socket.id, params.name, params.room, role, null);
 
     callback();
   })
@@ -42,10 +44,10 @@ io.on('connection', (socket) => {
   socket.on('startGame', (params) => {
     let user = users.addUser(socket.id, params.name, params.room);
     io.to(user.room).emit('updateUserList', users.getUserList(params.room));
-    io.to(user.room).emit('updateUserRole', users.updateUserListRoles());
+    io.to(user.room).emit('updateUserRole', users.updateUserListRoles(params.room));
     io.to(user.room).emit('timerStart');
 
-    updateUserCards();
+    updateUserCards(params);
  })
 
 
@@ -55,61 +57,92 @@ io.on('connection', (socket) => {
 
 
   socket.on('updateRounds', (rounds) => {
+    let user = users.getUser(socket.id);
     rounds++
     if(rounds>=3){ 
       rounds = 0;
     }
-    socket.emit('newRounds', rounds);
+    io.to(user.room).emit('newRounds', rounds);
   })
 
 
-  socket.on('clickOnPlayer', () => {
+  socket.on('clickOnPlayer', (isDiscussion) => {
     let user = users.getUser(socket.id);
-    if(user.role == "Killer") {
-      console.log("KILLER");
-      socket.emit('killPlayer');
-    }
-    else if(user.role == "Medic"){
-      console.log("MEDIC");
-      socket.emit('healPlayer');
-    }
+    console.log(user.role);
     
-    // else if(user.role == "Passanger"){
-    //   console.log("PASSANGER");
-    //   socket.emit('passPlayer');
-    // }
+    if(isDiscussion == false) {
+      if(user.role == "Killer") {
+        io.to(user.id).emit('killPlayer');
+      }
+      else if(user.role == "Medic"){
+        io.to(user.id).emit('healPlayer');
+      }
+      else if(user.role == "Passanger") {
+        console.log("It's just a passanger");
+      }
+    }
+    else if(isDiscussion == true) {
+      console.log("IS DISCUSSION");
+      io.to(user.room).emit('votePlayer');
+    }
   })
-  socket.on('isKilled', (clickedUser) => {
-    users.isAlive(clickedUser, "isDead");
+  socket.on('isKilled', (clickedUser, params) => {
+    users.isAlive(clickedUser, "isDead", params.room);
     isDeadUser = clickedUser;
   })
-  socket.on('isHealed', (clickedUser) => {
-    users.isAlive(clickedUser, "isHealed");
+  socket.on('isHealed', (clickedUser, params) => {
+    users.isAlive(clickedUser, "isHealed", params.room);
+  })
+  socket.on('isVoted', (clickedUser, params) => {
+    //isVoted++;
+    let someUser = users.getUserVote(params.room, params.name);
+    console.log(someUser);
+    if(someUser == null) {
+      users.isAlive(clickedUser, `isVoted-`, params.room)
+    }
+    else if (someUser != null) {
+      users.isAlive(clickedUser, `ALREADY VOTED MAN-`, params.room)
+    }
   })
 
 
 
 
-
-  socket.on('endRound', () => {
+  socket.on('endRound', (isDiscussion, params) => {
     let dead = "isDead";
     let healed = "isHealed";
+    let votedCount = isVoted;
 
-    let deadUser = users.getUserAlive(dead);
-    let healedUser = users.getUserAlive(healed);
+    let deadUser = users.getUserAlive(dead, params.room);
+    let healedUser = users.getUserAlive(healed, params.room);
+    let userId = users.getUser(socket.id);
+    let allUsers = users.getUserList(params.room);
 
-    if(deadUser.length >= 1) {
-      for (let i = 0; i<1; i++) {
-        io.to(deadUser[i].id).emit('testDeath');
-        io.to(deadUser[i].room).emit('updateDeadUser', isDeadUser);
-        io.to(healedUser[i].room).emit('clearRoom');
-        deadUser[i].alive = "alreadyDead";
+    if(!isDiscussion) {
+      if(deadUser.length >= 1) {
+        for (let i = 0; i<1; i++) {
+          io.to(deadUser[i].id).emit('testDeath');
+          io.to(deadUser[i].room).emit('updateDeadUser', isDeadUser);
+          io.to(userId.room).emit('clearRoom');
+          deadUser[i].alive = "alreadyDead";
+        }
+      }
+      else if (healedUser.length >= 1) {
+        for (let i = 0; i<1; i++) {
+          io.to(userId.room).emit('clearRoom');
+        }
       }
     }
-    else if (healedUser.length >= 1) {
-      for (let i = 0; i<1; i++) {
-        io.to(healedUser[i].room).emit('clearRoom');
+    else if(isDiscussion) {
+      if(votedCount >= (allUsers.length / 2)) {
+        io.to(userId.room).emit('finalVote');
+        io.to(userId.room).emit('clearRoom');
+        isVoted = 0;
       }
+      else {
+        isVoted = 0;
+      }
+
     }
   })
 
@@ -123,41 +156,40 @@ io.on('connection', (socket) => {
     let user = users.getUser(socket.id);
     io.to(user.room).emit('testRole', users.getUser(socket.id));
   })
-  socket.on('blackScreenPassanger', () => {
-    let userList = users.getUserRoles("Passanger");
+  socket.on('blackScreenPassanger', (params) => {
+    let userList = users.getUserRoles("Passanger", params.room);
     for(let i = 0; i<userList.length; i++) {
       io.to(userList[i].id).emit('blackScreen');
     }
   });
-  socket.on('blackScreenMedic', () => {
-    let userList = users.getUserRoles("Medic");
+  socket.on('blackScreenMedic', (params) => {
+    let userList = users.getUserRoles("Medic", params.room);
     for(let i = 0; i<userList.length; i++) {
       io.to(userList[i].id).emit('blackScreen');
     }
   });
-  socket.on('blackScreenKiller', () => {
-    let userList = users.getUserRoles("Killer");
+  socket.on('blackScreenKiller', (params) => {
+    let userList = users.getUserRoles("Killer", params.room);
     for(let i = 0; i<userList.length; i++) {
       io.to(userList[i].id).emit('blackScreen');
     }
   });
-
-  socket.on('whiteScreenKiller', () => {
-    let userList = users.getUserRoles("Killer");
+  socket.on('whiteScreenKiller', (params) => {
+    let userList = users.getUserRoles("Killer", params.room);
     for(let i = 0; i<userList.length; i++) {
       io.to(userList[i].id).emit('whiteScreen');
     }
   });
-  socket.on('whiteScreenMedic', () => {
-    let userList = users.getUserRoles("Medic");
+  socket.on('whiteScreenMedic', (params) => {
+    let userList = users.getUserRoles("Medic", params.room);
     for(let i = 0; i<userList.length; i++) {
       io.to(userList[i].id).emit('whiteScreen');
     }
   });
-  socket.on('whiteScreenPassanger', () => {
-    let killer      = users.getUserRoles("Killer");
-    let medic       = users.getUserRoles("Medic");
-    let passangers  = users.getUserRoles("Passanger");
+  socket.on('whiteScreenPassanger', (params) => {
+    let killer      = users.getUserRoles("Killer", params.room);
+    let medic       = users.getUserRoles("Medic", params.room);
+    let passangers  = users.getUserRoles("Passanger", params.room);
     for(let i = 0; i<passangers.length; i++) {
       io.to(passangers[i].id).emit('whiteScreen');
     }
@@ -166,10 +198,10 @@ io.on('connection', (socket) => {
   });
 });
 
-function updateUserCards() {
-  let killer      = users.getUserRoles("Killer");
-  let medic       = users.getUserRoles("Medic");
-  let passangers  = users.getUserRoles("Passanger");
+function updateUserCards(params) {
+  let killer      = users.getUserRoles("Killer", params.room);
+  let medic       = users.getUserRoles("Medic", params.room);
+  let passangers  = users.getUserRoles("Passanger", params.room);
   for(let i = 0; i<passangers.length; i++) {
     io.to(passangers[i].id).emit('passangerCard');
   }
