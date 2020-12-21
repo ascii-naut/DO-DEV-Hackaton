@@ -116,15 +116,20 @@ class Users {
         let killer = this.users.filter((user) => user.room === room && user.role === "Killer")[0];
         let medic = this.users.filter((user) => user.room === room && user.role === "Medic")[0];
 
-        if(killer.alive == 'alredyVotedOut') {
+        if(killer.alive == 'alreadyVotedOut') {
             return 1;
         }
         else if(medic.alive == 'alreadyVotedOut' || medic.alive == 'alreadyDead') {
             return 2;
         }
-        else {
+        else if(killer.alive != 'alreadyVotedOut'){
             return null;
         }
+    }
+
+    getAllUsersExceptKiller(room) {
+        let userList = this.users.filter((user) => user.room === room && user.role != "Killer");
+        return userList;
     }
 
     getUserAlive (alive, room) {

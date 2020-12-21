@@ -63,11 +63,11 @@ io.on('connection', (socket) => {
 
   socket.on('updateRounds', (rounds) => {
     let user = users.getUser(socket.id);
-    rounds++
-    if(rounds>=3){ 
+    rounds+=1;
+    if(rounds >= 4) {
       rounds = 0;
     }
-    io.to(user.room).emit('newRounds', rounds);
+    io.to(user.id).emit('newRounds', rounds);
   })
 
 
@@ -139,24 +139,28 @@ io.on('connection', (socket) => {
         users.refreshVotePoints(params.room);
       }
       else if (votedPlayer == null) {
+        io.to(userId.room).emit('clearRoom');
         users.refreshVotePoints(params.room);
       }
-      //users.getHighestVote(params.room);
-    }
-    let gameEnd = users.getUserRoleAndStatus(params.room);
-
-    if (gameEnd == 1) {
-      console.log('The game ended because the killer is out ---> the friendly sharks won!');
-    }
-    else if (gameEnd == 2) {
-      console.log('The medic is dead and this is no good news!');
-    }
-    else if (gameEnd == null) {
-      console.log('The game continues until the killer is found or all players are dead.');
     }
   })
 
-
+  socket.on('checkEndGame', (params) => {
+    let gameEnd = users.getUserRoleAndStatus(params.room);
+    let usersExcept = users.getAllUsersExceptKiller(params.room);
+      if (gameEnd == 1) {
+        console.log('The game ended because the killer is out ---> the friendly sharks won!');
+        for(let i = 0; i<usersExcept.length; i++) {
+          io.to(usersExcept[i].id).emit('gameIsEnded');
+        }
+      }
+      else if (gameEnd == 2) {
+        console.log('The medic is dead and this is no good news!');
+      }
+      else if (gameEnd == null) {
+        console.log('The game continues until the killer is found or all players are dead.');
+      }
+  })
 
 
 

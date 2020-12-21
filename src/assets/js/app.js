@@ -10,7 +10,7 @@ let allPlayers = document.getElementsByClassName('player');
 let timer = document.getElementById('timer');
 
 let isDiscussion = false;
-rounds = 0;
+rounds = 10;
 roleA = "Passanger";
 
 socket.on("connect", function() {
@@ -83,7 +83,7 @@ socket.on('votePlayer', () => {
         params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
         let clickedUser = this.id;
         this.classList.add("fa");
-        this.classList.add("fa-envelope");
+        this.classList.add("fa-times");
         this.style.pointerEvents = "none";
         for(let a = 0; a<allPlayers.length; a++) {
             allPlayers[a].style.pointerEvents = "none";
@@ -141,7 +141,9 @@ socket.on('killPlayer', () => {
 })
 
 socket.on('alertOnDeath', () => {
-    window.alert('Oh no! You are dead. =(');
+    let status = document.querySelector('.status');
+    status.style.color = "red";
+    status.innerHTML = "dead";
 })
 socket.on('updateDeadUser', (data) => {
     let a = document.getElementById(data);
@@ -153,15 +155,17 @@ socket.on('updateDeadUser', (data) => {
     a.style.pointerEvents = "none";
 })
 socket.on('alertOnVote', () => {
-    window.alert('Oh no, you have been put in jail!');
+    let status = document.querySelector('.status');
+    status.style.color = "red";
+    status.innerHTML = "jailed";
 })
 socket.on('updateVotedPlayer', (data) => {
     let a = document.getElementById(data);
-    a.classList.remove('fa-envelope');
+    a.classList.remove('fa-times');
     a.classList.remove('player');
     a.classList.add('fa');
     a.classList.add('fa-3x');
-    a.classList.add('fa-envelope');
+    a.classList.add('fa-times');
     a.style.pointerEvents = "none";
 })
 
@@ -171,7 +175,6 @@ function endRound() {
     let searchQuery = window.location.search.substring(1);
     params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
     socket.emit('endRound', isDiscussion, params);
-    socket.emit('refreshRound', 0);
 }
 
 socket.on('clearRoom', () => {
@@ -183,13 +186,27 @@ socket.on('clearRoom', () => {
             allPlayers[i].classList.remove('fa-3x');
             allPlayers[i].classList.remove('fa-skull-crossbones');
             allPlayers[i].classList.remove('fa-heart');
+            allPlayers[i].classList.remove('fa-times');
             allPlayers[i].style.pointerEvents = "all";
         }
     }
 })
 
 
+socket.on('gameIsEnded', () => {
+    let a = setInterval(function () {
+        let victory = document.getElementById('victory');
+        let notVictory = document.getElementById('notVictory');
 
+        notVictory.style.display = "none";
+        victory.style.display = "block";
+        clearInterval(a);
+    }, 1000);
+    let b = setInterval(function () {
+        window.location.href = "/";
+        clearInterval(b);
+    }, 5000)
+})
 
 
 
@@ -224,6 +241,7 @@ socket.on('medicCard', () => {
 function startRoundKiller() {
     let searchQuery = window.location.search.substring(1);
     params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
+    isDiscussion = false;
     socket.emit("blackScreenPassanger", params);
     socket.emit("blackScreenMedic", params);
     socket.emit("whiteScreenKiller", params);
@@ -248,16 +266,19 @@ function startRoundMedic() {
 function startRoundPassanger() {
     let searchQuery = window.location.search.substring(1);
     params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
+    isDiscussion = true;
     socket.emit("whiteScreenPassanger", params);
     socket.emit("whiteScreenKiller", params);
     socket.emit("whiteScreenMedic", params);
     socket.emit('updateRounds', rounds);
-    endRound();
-
-    // for(let i = 0; i<allPlayers.length; i++) {
-    //     allPlayers[i].style.pointerEvents = "all";
-    // }
 }
+
+function checkEndGame() {
+    let searchQuery = window.location.search.substring(1);
+    params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
+    socket.emit('checkEndGame', params);
+}
+
 socket.on('newRounds', (newRounds) => {
     rounds = newRounds;
     console.log(rounds);
@@ -270,7 +291,7 @@ function timerStart() {
             timer.innerHTML -= 1;
             if(timer.innerHTML == 0) {
                 clearInterval(a);
-                timer.innerHTML = 10;
+                timer.innerHTML = 5;
                 startRoundKiller();
             }
         }, 1000);
@@ -290,10 +311,20 @@ function timerStart() {
             timer.innerHTML -= 1;
             if(timer.innerHTML == 0) {
                 clearInterval(c);
-                timer.innerHTML = 5;
+                timer.innerHTML = 10;
                 startRoundPassanger();
             }
         }, 1000);
+    }
+    else if(rounds == 3) {
+        let d = setInterval(function () {
+            timer.innerHTML -= 1;
+            if(timer.innerHTML == 0) {
+                clearInterval(d);
+                timer.innerHTML = 10;
+                endRound();
+            }
+        }, 1000)
     }
 }
 

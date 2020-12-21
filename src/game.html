@@ -34,7 +34,10 @@
               font-weight: 800;
             "
           >
-            Time Left: <span id="timer" style="color: rgb(231, 68, 68);">10</span>s
+            Time Left: <span id="timer" style="color: rgb(231, 68, 68);">1</span>s
+          </h3>
+          <h3 style="right: 20px; top: 10px; border-left: 2px solid black; border-bottom: 2px solid black; padding: 0 0 10px 15px; position: fixed; font-weight: 800;">
+            Status: <span class="status" style="color: rgb(92, 179, 92);">alive</span>
           </h3>
           <div class="row" style="height: 100px"></div>
           <button id="testUpdate" onclick="testRole()">Role Test</button>
@@ -43,7 +46,7 @@
           <div class="row justify-content-center" id="playerCol">
 
           </div>
-          <div class="row justify-content-center pt-5 w-50 m-auto">
+          <div class="row justify-content-center pt-5 w-50 m-auto" id="notVictory">
             <h3 class="font-weight-bold mb-4" style="font-size: 40px">
               There's been a murder!
             </h3>
@@ -57,6 +60,12 @@
               <!-- BOTTOM PLAYER HERE -->
               <button id="testUpdate" onclick="startGame()">Start Game</button>
             </span>
+          </div>
+
+          <div class="row justify-content-center pt-5 w-50 m-auto" id ="victory" style="display: none;">
+            <h3 class="font-weight-bold mb-4" style="font-size: 40px">
+              You are victorious!!!!!!
+            </h3>
           </div>
           <div class="row justify-content-center">
             <div
