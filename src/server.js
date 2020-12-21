@@ -13,8 +13,6 @@ server.listen(port, ()=> {
 
 let isDeadUser = "";
 let isHealedUser = "";
-let isVoted = 0;
-let saveVote = [];
 
 
 
@@ -32,7 +30,7 @@ io.on('connection', (socket) => {
     socket.join(params.room)
 
     users.removeUser(socket.id);
-    users.addUser(socket.id, params.name, params.room, role, null);
+    users.addUser(socket.id, params.name, params.room, role, 0);
 
     callback();
   })
@@ -43,8 +41,15 @@ io.on('connection', (socket) => {
 
   socket.on('startGame', (params) => {
     let user = users.addUser(socket.id, params.name, params.room);
+    let allRoomUsers = users.getRoom(params.room);
     io.to(user.room).emit('updateUserList', users.getUserList(params.room));
     io.to(user.room).emit('updateUserRole', users.updateUserListRoles(params.room));
+    
+    for (let i = 0; i<allRoomUsers.length; i++) {
+       io.to(allRoomUsers[i].id).emit('removeSelf', allRoomUsers[i].name);
+    }
+
+
     io.to(user.room).emit('timerStart');
 
     updateUserCards(params);
@@ -68,9 +73,8 @@ io.on('connection', (socket) => {
 
   socket.on('clickOnPlayer', (isDiscussion) => {
     let user = users.getUser(socket.id);
-    console.log(user.role);
     
-    if(isDiscussion == false) {
+    if(!isDiscussion) {
       if(user.role == "Killer") {
         io.to(user.id).emit('killPlayer');
       }
@@ -78,12 +82,10 @@ io.on('connection', (socket) => {
         io.to(user.id).emit('healPlayer');
       }
       else if(user.role == "Passanger") {
-        console.log("It's just a passanger");
       }
     }
-    else if(isDiscussion == true) {
-      console.log("IS DISCUSSION");
-      io.to(user.room).emit('votePlayer');
+    else if(isDiscussion) {
+      io.to(user.id).emit('votePlayer');
     }
   })
   socket.on('isKilled', (clickedUser, params) => {
@@ -93,35 +95,29 @@ io.on('connection', (socket) => {
   socket.on('isHealed', (clickedUser, params) => {
     users.isAlive(clickedUser, "isHealed", params.room);
   })
-  socket.on('isVoted', (clickedUser, params) => {
-    //isVoted++;
-    let someUser = users.getUserVote(params.room, params.name);
-    console.log(someUser);
-    if(someUser == null) {
-      users.isAlive(clickedUser, `isVoted-`, params.room)
-    }
-    else if (someUser != null) {
-      users.isAlive(clickedUser, `ALREADY VOTED MAN-`, params.room)
-    }
-  })
 
+  socket.on('isVoted', (clickedUser, params) => {
+    users.isVoted(clickedUser, params.room);
+  })
+  
+
+  
 
 
 
   socket.on('endRound', (isDiscussion, params) => {
     let dead = "isDead";
     let healed = "isHealed";
-    let votedCount = isVoted;
 
     let deadUser = users.getUserAlive(dead, params.room);
     let healedUser = users.getUserAlive(healed, params.room);
     let userId = users.getUser(socket.id);
-    let allUsers = users.getUserList(params.room);
+    let votedPlayer = users.getHighestVote(params.room);
 
     if(!isDiscussion) {
       if(deadUser.length >= 1) {
         for (let i = 0; i<1; i++) {
-          io.to(deadUser[i].id).emit('testDeath');
+          io.to(deadUser[i].id).emit('alertOnDeath');
           io.to(deadUser[i].room).emit('updateDeadUser', isDeadUser);
           io.to(userId.room).emit('clearRoom');
           deadUser[i].alive = "alreadyDead";
@@ -134,15 +130,29 @@ io.on('connection', (socket) => {
       }
     }
     else if(isDiscussion) {
-      if(votedCount >= (allUsers.length / 2)) {
-        io.to(userId.room).emit('finalVote');
+      if(votedPlayer != null) {
+        let isVotedPlayer = votedPlayer.name;
+        io.to(votedPlayer.id).emit('alertOnVote');
+        io.to(votedPlayer.room).emit('updateVotedPlayer', isVotedPlayer);
         io.to(userId.room).emit('clearRoom');
-        isVoted = 0;
+        votedPlayer.alive = "alreadyVotedOut";
+        users.refreshVotePoints(params.room);
       }
-      else {
-        isVoted = 0;
+      else if (votedPlayer == null) {
+        users.refreshVotePoints(params.room);
       }
+      //users.getHighestVote(params.room);
+    }
+    let gameEnd = users.getUserRoleAndStatus(params.room);
 
+    if (gameEnd == 1) {
+      console.log('The game ended because the killer is out ---> the friendly sharks won!');
+    }
+    else if (gameEnd == 2) {
+      console.log('The medic is dead and this is no good news!');
+    }
+    else if (gameEnd == null) {
+      console.log('The game continues until the killer is found or all players are dead.');
     }
   })
 

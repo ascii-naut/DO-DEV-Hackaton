@@ -8,11 +8,10 @@ let medicCard = document.getElementById('medicCard');
 let passangerCard = document.getElementById('passangerCard');
 let allPlayers = document.getElementsByClassName('player');
 let timer = document.getElementById('timer');
-let isDiscussion = false;
 
-rounds = 30;
+let isDiscussion = false;
+rounds = 0;
 roleA = "Passanger";
-let voteCount = 0;
 
 socket.on("connect", function() {
 
@@ -33,7 +32,7 @@ socket.on("connect", function() {
 });
 socket.on("updateUserList", (users) => {
     let players = document.getElementById('playerCol');
-    //let colors = ["red", "blue", "black", "yellow", "green"]
+    let colors = ["#ff7e7e", "#9393ff", "#f5ff80", "#91ff8c", "#ff8cf4", "#cb8cff", "black", "#a1ffe7", "#868686"]
 
     for(let i = 0; i < users.length-1; i++) {
         let playerDiv = document.createElement("DIV");
@@ -43,16 +42,21 @@ socket.on("updateUserList", (users) => {
         playerDiv.classList.add("col");
         playerButton.classList.add("playerButton");
         playerButton.classList.add("player");
-        // playerButton.classList.add(users[i]);
         playerButton.id = users[i];
+        playerDiv.id = `${users[i]}-col`
         playerName.innerHTML = users[i];
-        //playerButton.style.backgroundColor = colors[i];
+        playerButton.style.border = `3px solid ${colors[i]}`;
 
         playerDiv.appendChild(playerButton);
         playerDiv.appendChild(playerName);
         players.appendChild(playerDiv);
     }
 });
+socket.on('removeSelf', (user) => {
+     let self = document.getElementById(`${user}-col`);
+     self.style.display = "none";
+    //console.log(`${user}-col`);
+})
 socket.on("updateUserRole", () => {
     for(let i = 0; i<allPlayers.length; i++) {
         allPlayers[i].addEventListener('click', clickOnPlayer);
@@ -68,26 +72,33 @@ function startGame() {
     socket.emit("startGame", params);
 }
 
+
 socket.on('votePlayer', () => {
     for(let i = 0; i<allPlayers.length; i++) {
-        let data = i;
-        allPlayers[i].addEventListener('click', votePlayer);
+        allPlayers[i].addEventListener('click', showIcon);
+    }
+
+    function showIcon() {
+        let searchQuery = window.location.search.substring(1);
+        params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
+        let clickedUser = this.id;
+        this.classList.add("fa");
+        this.classList.add("fa-envelope");
+        this.style.pointerEvents = "none";
+        for(let a = 0; a<allPlayers.length; a++) {
+            allPlayers[a].style.pointerEvents = "none";
+        }
+        console.log(clickedUser + "is healed");
+        socket.emit('isVoted', clickedUser, params);
     }
 })
 
-function votePlayer() {
-    let searchQuery = window.location.search.substring(1);
-    params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
-    let clickedUser = this.id;
-    //this.classList.add(`voted-${voteCount}`);
-    this.style.pointerEvents = "none";
-    for(let a = 0; a<allPlayers.length; a++) {
-        allPlayers[a].style.pointerEvents = "none";
-    }
-    socket.emit('isVoted', clickedUser, params);
-}
 
 
+
+// function refreshRound() {
+//     socket.emit('refreshRound', 0);
+// }
 
 
 socket.on('healPlayer', () => {
@@ -129,8 +140,8 @@ socket.on('killPlayer', () => {
     }
 })
 
-socket.on('testDeath', () => {
-    window.alert('YOU ARE DEAD :XXX');
+socket.on('alertOnDeath', () => {
+    window.alert('Oh no! You are dead. =(');
 })
 socket.on('updateDeadUser', (data) => {
     let a = document.getElementById(data);
@@ -141,6 +152,18 @@ socket.on('updateDeadUser', (data) => {
     a.classList.add('fa-skull-crossbones');
     a.style.pointerEvents = "none";
 })
+socket.on('alertOnVote', () => {
+    window.alert('Oh no, you have been put in jail!');
+})
+socket.on('updateVotedPlayer', (data) => {
+    let a = document.getElementById(data);
+    a.classList.remove('fa-envelope');
+    a.classList.remove('player');
+    a.classList.add('fa');
+    a.classList.add('fa-3x');
+    a.classList.add('fa-envelope');
+    a.style.pointerEvents = "none";
+})
 
 
 
@@ -148,6 +171,7 @@ function endRound() {
     let searchQuery = window.location.search.substring(1);
     params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
     socket.emit('endRound', isDiscussion, params);
+    socket.emit('refreshRound', 0);
 }
 
 socket.on('clearRoom', () => {
@@ -256,7 +280,7 @@ function timerStart() {
             timer.innerHTML -= 1;
             if(timer.innerHTML == 0) {
                 clearInterval(b);
-                timer.innerHTML = 7;
+                timer.innerHTML = 5;
                 startRoundMedic();
             }
         }, 1000);

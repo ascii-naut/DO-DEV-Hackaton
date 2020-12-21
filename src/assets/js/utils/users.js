@@ -61,12 +61,70 @@ class Users {
         return user;
     }
 
+    isVoted(playerName, room) {
+        let user = this.users.filter((user) => user.name === playerName && user.room === room)[0];
+        user.alive += 1;
+        return user;
+    }
+
+    refreshVotePoints(room) {
+        let users = this.users.filter((user) => user.room === room);
+        for (let i = 0; i<users.length; i++) {
+            if(users[i].alive != 'alreadyVotedOut' && users[i].alive != 'alreadyDead'){
+                users[i].alive = 0;
+            }
+        }
+    }
+
+    getHighestVote(room) {
+        let userList = this.users.filter((user) => user.room === room);
+        let voteArray = [];
+        let finalVote;
+        for(let i = 0; i<userList.length-1; i++) {
+            voteArray[i] = userList[i].alive;
+        }
+
+        finalVote = Math.max.apply(null, voteArray);
+        let votedUser = this.users.filter((user) => user.room === room && user.alive === finalVote);
+
+        if(votedUser.length == 1) {
+            for(let a = 0; a<votedUser.length; a++) {
+                console.log(votedUser[a].name);
+                return votedUser[a];
+            }
+        }
+        else if(votedUser.length >= 1) {
+            return null;
+        }
+
+    }
+
     getUser(id) {
         return this.users.filter((user) => user.id === id)[0];
     }
 
+    getRoom(room) {
+        let users = this.users.filter((user) => user.room === room);
+        return users;
+    }
+
     getUserRoles (role, room) {
         return this.users.filter((user) => user.role === role && user.room === room);
+    }
+
+    getUserRoleAndStatus(room) {
+        let killer = this.users.filter((user) => user.room === room && user.role === "Killer")[0];
+        let medic = this.users.filter((user) => user.room === room && user.role === "Medic")[0];
+
+        if(killer.alive == 'alredyVotedOut') {
+            return 1;
+        }
+        else if(medic.alive == 'alreadyVotedOut' || medic.alive == 'alreadyDead') {
+            return 2;
+        }
+        else {
+            return null;
+        }
     }
 
     getUserAlive (alive, room) {
