@@ -56,6 +56,10 @@ function spawnEnemyPlayers() {
     }
 }
 
+function showRules() {
+    console.log("It's working.");
+}
+
 hoverOnCard();
 // spawnBottomPlayer();
 // spawnEnemyPlayers();
