@@ -38,6 +38,11 @@ class Users {
         //return user;
     }
 
+    getUsersFromRoom(room, name) {
+        let user = this.users.filter((user) => user.room === room && user.name === name);
+        return user;
+    }
+
     updateUserListRoles (room, role1, role2) {
         let random1 = Math.floor(Math.random() * this.users.length);
         let random2 = Math.floor(Math.random() * this.users.length);

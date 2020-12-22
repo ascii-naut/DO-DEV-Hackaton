@@ -24,6 +24,7 @@ io.on('connection', (socket) => {
   console.log('a user connected');
 
   socket.on('join', (params, role, callback) => {
+
     if(!isRealString(params.name) || !isRealString(params.room)){
       return callback('Name and room are required.')
     }
@@ -33,19 +34,25 @@ io.on('connection', (socket) => {
     users.addUser(socket.id, params.name, params.room, role, 0);
 
     let user = users.getUser(socket.id);
+    let allusers = users.getUserList(params.room);
+    let existingUser = users.getUsersFromRoom(params.room, user.name);
+    
+    for(let i = 0; i<existingUser.length; i++) {
+      if(existingUser[1]!=undefined) {
+        return callback('There is already a user with that name in the game. Please choose a different one.');
+      }
+    }
+    
     io.to(user.room).emit('resetButtons');
     io.to(user.room).emit('updatePlayers', users.getUserList(params.room));
 
-    // let user = users.getUser(socket.id);
     // let allUsers = users.getUserList(params.room);
-    // if(user) {
-    //   for (let i = 0; i<allUsers.length; i++) {
-    //     if(allUsers[i].name == user.name) {
-    //       io.to(user.room).emit('removeUser', user.name);
-    //       window.location.href = "/";
+    // for (let i = 0; i<allUsers.length; i++) {
+    //     if(allUsers[i] == user.name && allUsers.length > 1) {
+    //       io.to(user.room).emit('removeUser', socket.id);
+    //       io.to(socket.id).emit('disconnectPlease');
     //       console.log('user should be removed');
     //     }
-    //   }
     // }
 
     callback();

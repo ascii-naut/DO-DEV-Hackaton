@@ -35,6 +35,9 @@ socket.on('removeUser', (data) => {
     let userButton = document.getElementById(data + "-col");
     userButton.style.display = 'none';
 })
+socket.on('disconnectPlease', () => {
+    window.location.href = "/";
+})
 function startGame() {
     let searchQuery = window.location.search.substring(1);
     params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
