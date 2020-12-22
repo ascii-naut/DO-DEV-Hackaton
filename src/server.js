@@ -37,13 +37,16 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
     let user = users.removeUser(socket.id);
+    if(user) {
+      io.to(user.room).emit('removeUser', user.name);
+    }
   })
 
   socket.on('startGame', (params) => {
     let user = users.addUser(socket.id, params.name, params.room);
     let allRoomUsers = users.getRoom(params.room);
     io.to(user.room).emit('updateUserList', users.getUserList(params.room));
-    io.to(user.room).emit('updateUserRole', users.updateUserListRoles(params.room));
+    io.to(user.room).emit(users.updateUserListRoles(params.room));
     
     for (let i = 0; i<allRoomUsers.length; i++) {
        io.to(allRoomUsers[i].id).emit('removeSelf', allRoomUsers[i].name);
@@ -59,32 +62,23 @@ io.on('connection', (socket) => {
 
 
 
-
-
-  socket.on('updateRounds', (rounds) => {
+  socket.on('updateRounds', () => {
     let user = users.getUser(socket.id);
-    rounds+=1;
-    if(rounds >= 4) {
-      rounds = 0;
-    }
-    io.to(user.id).emit('newRounds', rounds);
+    io.to(user.id).emit('newRound');
   })
-
 
   socket.on('clickOnPlayer', (isDiscussion) => {
     let user = users.getUser(socket.id);
-    
-    if(!isDiscussion) {
+
+    if(isDiscussion == false) {
       if(user.role == "Killer") {
         io.to(user.id).emit('killPlayer');
       }
       else if(user.role == "Medic"){
         io.to(user.id).emit('healPlayer');
       }
-      else if(user.role == "Passanger") {
-      }
     }
-    else if(isDiscussion) {
+    else if(isDiscussion == true) {
       io.to(user.id).emit('votePlayer');
     }
   })
@@ -105,7 +99,7 @@ io.on('connection', (socket) => {
 
 
 
-  socket.on('endRound', (isDiscussion, params) => {
+  socket.on('endRound', (params, isDiscussion) => {
     let dead = "isDead";
     let healed = "isHealed";
 
@@ -145,6 +139,10 @@ io.on('connection', (socket) => {
     }
   })
 
+  socket.on('resetStatus', (params) => {
+    users.resetStatus(params.room);
+  })
+
   socket.on('checkEndGame', (params) => {
     let gameEnd = users.getUserRoleAndStatus(params.room);
     let usersExcept = users.getAllUsersExceptKiller(params.room);
@@ -156,6 +154,7 @@ io.on('connection', (socket) => {
       }
       else if (gameEnd == 2) {
         console.log('The medic is dead and this is no good news!');
+
       }
       else if (gameEnd == null) {
         console.log('The game continues until the killer is found or all players are dead.');

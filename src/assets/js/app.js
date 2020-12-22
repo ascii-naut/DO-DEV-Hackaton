@@ -2,15 +2,16 @@ let socket = io();
 let startButton = document.getElementById("startButton");
 let loginSection = document.getElementById("loginSection");
 let gameSection = document.getElementById("gameSection");
-let updateButton = document.getElementById("testUpdate");
 let killerCard = document.getElementById('killerCard');
 let medicCard = document.getElementById('medicCard');
 let passangerCard = document.getElementById('passangerCard');
 let allPlayers = document.getElementsByClassName('player');
 let timer = document.getElementById('timer');
+let startBtn = document.getElementById('startButton');
 
 let isDiscussion = false;
-rounds = 10;
+let rounds = 0;
+
 roleA = "Passanger";
 
 socket.on("connect", function() {
@@ -30,9 +31,20 @@ socket.on("connect", function() {
 
     })
 });
+socket.on('removeUser', (data) => {
+    let userButton = document.getElementById(data + "-col");
+    userButton.style.display = 'none';
+})
+function startGame() {
+    let searchQuery = window.location.search.substring(1);
+    params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
+
+    socket.emit("startGame", params);
+}
 socket.on("updateUserList", (users) => {
     let players = document.getElementById('playerCol');
     let colors = ["#ff7e7e", "#9393ff", "#f5ff80", "#91ff8c", "#ff8cf4", "#cb8cff", "black", "#a1ffe7", "#868686"]
+    startBtn.style.display = "none";
 
     for(let i = 0; i < users.length-1; i++) {
         let playerDiv = document.createElement("DIV");
@@ -46,6 +58,7 @@ socket.on("updateUserList", (users) => {
         playerDiv.id = `${users[i]}-col`
         playerName.innerHTML = users[i];
         playerButton.style.border = `3px solid ${colors[i]}`;
+        playerButton.addEventListener('click', clickOnPlayer);
 
         playerDiv.appendChild(playerButton);
         playerDiv.appendChild(playerName);
@@ -55,144 +68,72 @@ socket.on("updateUserList", (users) => {
 socket.on('removeSelf', (user) => {
      let self = document.getElementById(`${user}-col`);
      self.style.display = "none";
-    //console.log(`${user}-col`);
 })
-socket.on("updateUserRole", () => {
-    for(let i = 0; i<allPlayers.length; i++) {
-        allPlayers[i].addEventListener('click', clickOnPlayer);
-    }
-})
+
 function clickOnPlayer() {
     socket.emit('clickOnPlayer', isDiscussion);
 }
-function startGame() {
-    let searchQuery = window.location.search.substring(1);
-    params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
-
-    socket.emit("startGame", params);
-}
-
 
 socket.on('votePlayer', () => {
     for(let i = 0; i<allPlayers.length; i++) {
-        allPlayers[i].addEventListener('click', showIcon);
-    }
-
-    function showIcon() {
-        let searchQuery = window.location.search.substring(1);
-        params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
-        let clickedUser = this.id;
-        this.classList.add("fa");
-        this.classList.add("fa-times");
-        this.style.pointerEvents = "none";
-        for(let a = 0; a<allPlayers.length; a++) {
-            allPlayers[a].style.pointerEvents = "none";
-        }
-        console.log(clickedUser + "is healed");
-        socket.emit('isVoted', clickedUser, params);
+        allPlayers[i].addEventListener('click', showIconVote);
     }
 })
-
-
-
-
-// function refreshRound() {
-//     socket.emit('refreshRound', 0);
-// }
-
-
+function showIconVote() {
+    let searchQuery = window.location.search.substring(1);
+    params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
+    let clickedUser = this.id;
+    this.classList.add("fa");
+    this.classList.add("fa-times");
+    this.style.pointerEvents = "none";
+    for(let a = 0; a<allPlayers.length; a++) {
+        allPlayers[a].style.pointerEvents = "none";
+    }
+    socket.emit('isVoted', clickedUser, params);
+}
 socket.on('healPlayer', () => {
     for(let i = 0; i<allPlayers.length; i++) {
-        allPlayers[i].addEventListener('click', showIcon);
-    }
-
-    function showIcon() {
-        let searchQuery = window.location.search.substring(1);
-        params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
-        let clickedUser = this.id;
-        this.classList.add("fa");
-        this.classList.add("fa-heart");
-        this.style.pointerEvents = "none";
-        for(let a = 0; a<allPlayers.length; a++) {
-            allPlayers[a].style.pointerEvents = "none";
-        }
-        console.log(clickedUser + "is healed");
-        socket.emit('isHealed', clickedUser, params);
+        allPlayers[i].addEventListener('click', showIconHeal);
     }
 })
+function showIconHeal() {
+    let searchQuery = window.location.search.substring(1);
+    params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
+    let clickedUser = this.id;
+    this.classList.add("fa");
+    this.classList.add("fa-heart");
+    this.style.pointerEvents = "none";
+    for(let a = 0; a<allPlayers.length; a++) {
+        allPlayers[a].style.pointerEvents = "none";
+    }
+    socket.emit('isHealed', clickedUser, params);
+}
 
 socket.on('killPlayer', () => {
     for(let i = 0; i<allPlayers.length; i++) {
-        allPlayers[i].addEventListener('click', showIcon);
-    }
-    function showIcon() {
-        let searchQuery = window.location.search.substring(1);
-        params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
-        let clickedUser = this.id;
-        this.classList.add("fa");
-        this.classList.add("fa-skull-crossbones");
-        this.style.pointerEvents = "none";
-        for(let a = 0; a<allPlayers.length; a++) {
-            allPlayers[a].style.pointerEvents = "none";
-        }
-        console.log(clickedUser + "is killed");
-        socket.emit('isKilled', clickedUser, params);
+        allPlayers[i].addEventListener('click', showIconKill);
     }
 })
-
-socket.on('alertOnDeath', () => {
-    let status = document.querySelector('.status');
-    status.style.color = "red";
-    status.innerHTML = "dead";
-})
-socket.on('updateDeadUser', (data) => {
-    let a = document.getElementById(data);
-    a.classList.remove('fa-skull-crossbones');
-    a.classList.remove('player');
-    a.classList.add('fa');
-    a.classList.add('fa-3x');
-    a.classList.add('fa-skull-crossbones');
-    a.style.pointerEvents = "none";
-})
-socket.on('alertOnVote', () => {
-    let status = document.querySelector('.status');
-    status.style.color = "red";
-    status.innerHTML = "jailed";
-})
-socket.on('updateVotedPlayer', (data) => {
-    let a = document.getElementById(data);
-    a.classList.remove('fa-times');
-    a.classList.remove('player');
-    a.classList.add('fa');
-    a.classList.add('fa-3x');
-    a.classList.add('fa-times');
-    a.style.pointerEvents = "none";
-})
+function showIconKill() {
+    let searchQuery = window.location.search.substring(1);
+    params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
+    let clickedUser = this.id;
+    this.classList.add("fa");
+    this.classList.add("fa-skull-crossbones");
+    this.style.pointerEvents = "none";
+    for(let a = 0; a<allPlayers.length; a++) {
+        allPlayers[a].style.pointerEvents = "none";
+    }
+    socket.emit('isKilled', clickedUser, params);
+}
 
 
 
 function endRound() {
     let searchQuery = window.location.search.substring(1);
     params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
-    socket.emit('endRound', isDiscussion, params);
+    socket.emit('endRound', params, isDiscussion);
 }
-
-socket.on('clearRoom', () => {
-    clearRoom();
-
-    function clearRoom() {
-        for (let i = 0; i<allPlayers.length; i++) {
-            allPlayers[i].classList.remove('fa');
-            allPlayers[i].classList.remove('fa-3x');
-            allPlayers[i].classList.remove('fa-skull-crossbones');
-            allPlayers[i].classList.remove('fa-heart');
-            allPlayers[i].classList.remove('fa-times');
-            allPlayers[i].style.pointerEvents = "all";
-        }
-    }
-})
-
-
 socket.on('gameIsEnded', () => {
     let a = setInterval(function () {
         let victory = document.getElementById('victory');
@@ -207,11 +148,186 @@ socket.on('gameIsEnded', () => {
         clearInterval(b);
     }, 5000)
 })
+function checkEndGame() {
+    let searchQuery = window.location.search.substring(1);
+    params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
+    socket.emit('checkEndGame', params);
+}
 
+
+
+
+
+
+
+
+function startRoundKiller() {
+    let searchQuery = window.location.search.substring(1);
+    params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
+    socket.emit('whiteScreenKiller', params);
+    socket.emit("blackScreenPassanger", params);
+    socket.emit("blackScreenMedic", params);
+
+    socket.emit('updateRounds');
+
+    for(let i = 0; i<allPlayers.length; i++) {
+        allPlayers[i].style.pointerEvents = "all";
+    }
+}
+function startRoundMedic() {
+    let searchQuery = window.location.search.substring(1);
+    params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
+    socket.emit("blackScreenKiller", params);
+    socket.emit('blackScreenPassanger', params);
+    socket.emit("whiteScreenMedic", params);
+    
+    socket.emit('updateRounds');
+
+    for(let i = 0; i<allPlayers.length; i++) {
+        allPlayers[i].style.pointerEvents = "all";
+    }
+}
+
+function startRoundPassanger() {
+    let searchQuery = window.location.search.substring(1);
+    params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
+    socket.emit("whiteScreenKiller", params);
+    socket.emit('whiteScreenMedic', params);
+    socket.emit("whiteScreenPassanger", params);
+    
+    socket.emit('updateRounds');
+
+    for(let i = 0; i<allPlayers.length; i++) {
+        allPlayers[i].style.pointerEvents = "all";
+    }
+}
 
 
 socket.on('timerStart', () => {
-    timerStart();
+    timerStatus();
+})
+socket.on('newRound', () => {
+    rounds++;
+    if(rounds == 4) {
+        rounds = 0;
+    }
+    timerStatus();
+})
+
+function timerStatus() {
+    if(rounds == 0) { // GET READY ROUND
+        checkEndGame();
+        let a = setInterval(() => {
+            timer.innerHTML -= 1;
+            if(timer.innerHTML == 0) {
+                clearInterval(a);
+                startRoundKiller();
+                timer.innerHTML = 5;
+            }
+        }, 1000);
+    }
+    else if(rounds == 1) { // KILLER ROUND
+        let b = setInterval(() => {
+            for(let i = 0; i<allPlayers.length; i++) {
+                allPlayers[i].removeEventListener('click', showIconVote);
+                allPlayers[i].removeEventListener('click', showIconHeal);
+                allPlayers[i].removeEventListener('click', showIconKill);
+                allPlayers[i].removeEventListener('click', clickOnPlayer);
+                isDiscussion = false;
+                allPlayers[i].addEventListener('click', clickOnPlayer);
+            }
+            timer.innerHTML -= 1;
+            if(timer.innerHTML == 0) {
+                clearInterval(b);
+                startRoundMedic();
+                timer.innerHTML = 5;
+            }
+        }, 1000);
+    }
+    else if(rounds == 2) { // MEDIC ROUND
+        let b = setInterval(() => {
+            timer.innerHTML -= 1;
+            if(timer.innerHTML == 0) {
+                clearInterval(b);
+                endRound();
+                for(let i = 0; i<allPlayers.length; i++) {
+                    allPlayers[i].removeEventListener('click', showIconVote);
+                    allPlayers[i].removeEventListener('click', showIconHeal);
+                    allPlayers[i].removeEventListener('click', showIconKill);
+                    allPlayers[i].removeEventListener('click', clickOnPlayer);
+                    isDiscussion = true;
+                    allPlayers[i].addEventListener('click', clickOnPlayer);
+                }
+                startRoundPassanger();
+                timer.innerHTML = 15;
+            }
+        }, 1000);
+    }
+    else if(rounds == 3) { // PASSANGER ROUND
+        resetStatus();
+        let b = setInterval(() => {
+            timer.innerHTML -= 1;
+            if(timer.innerHTML == 0) {
+                clearInterval(b);
+                isDiscussion = true;
+                endRound();
+                socket.emit('updateRounds');
+                timer.innerHTML = 5;
+            }
+        }, 1000);
+    }
+}
+
+
+function resetStatus() {
+    let searchQuery = window.location.search.substring(1);
+    params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
+    socket.emit('resetStatus', params);
+}
+
+
+
+
+
+
+
+socket.on('updateDeadUser', (data) => {
+    let a = document.getElementById(data);
+    a.classList.remove('fa-skull-crossbones');
+    a.classList.remove('player');
+    a.classList.add('fa');
+    a.classList.add('fa-3x');
+    a.classList.add('fa-skull-crossbones');
+    a.style.pointerEvents = "none";
+})
+socket.on('updateVotedPlayer', (data) => {
+    let a = document.getElementById(data);
+    a.classList.remove('fa-times');
+    a.classList.remove('player');
+    a.classList.add('fa');
+    a.classList.add('fa-3x');
+    a.classList.add('fa-times');
+    a.style.pointerEvents = "none";
+})
+socket.on('alertOnDeath', () => {
+    let status = document.querySelector('.status');
+    status.style.color = "red";
+    status.innerHTML = "dead";
+})
+socket.on('alertOnVote', () => {
+    let status = document.querySelector('.status');
+    status.style.color = "red";
+    status.innerHTML = "jailed";
+})
+socket.on('clearRoom', () => {
+    for (let i = 0; i<allPlayers.length; i++) {
+        allPlayers[i].classList.remove('fa');
+        allPlayers[i].classList.remove('fa-3x');
+        allPlayers[i].classList.remove('fa-skull-crossbones');
+        allPlayers[i].classList.remove('fa-heart');
+        allPlayers[i].classList.remove('fa-times');
+        allPlayers[i].style.pointerEvents = "all";
+    }
 })
 socket.on('blackScreen', () => {
     let blackScreen = document.getElementById('blackScreen');
@@ -238,109 +354,12 @@ socket.on('medicCard', () => {
     medicCard.style.display = "block";
     passangerCard.style.display = "none";
 })
-function startRoundKiller() {
-    let searchQuery = window.location.search.substring(1);
-    params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
-    isDiscussion = false;
-    socket.emit("blackScreenPassanger", params);
-    socket.emit("blackScreenMedic", params);
-    socket.emit("whiteScreenKiller", params);
-    socket.emit('updateRounds', rounds);
-
-    for(let i = 0; i<allPlayers.length; i++) {
-        allPlayers[i].style.pointerEvents = "all";
-    }
-}
-function startRoundMedic() {
-    let searchQuery = window.location.search.substring(1);
-    params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
-    socket.emit("blackScreenKiller", params);
-    socket.emit("blackScreenPassanger", params);
-    socket.emit("whiteScreenMedic", params);
-    socket.emit('updateRounds', rounds);
-
-    for(let i = 0; i<allPlayers.length; i++) {
-        allPlayers[i].style.pointerEvents = "all";
-    }
-}
-function startRoundPassanger() {
-    let searchQuery = window.location.search.substring(1);
-    params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
-    isDiscussion = true;
-    socket.emit("whiteScreenPassanger", params);
-    socket.emit("whiteScreenKiller", params);
-    socket.emit("whiteScreenMedic", params);
-    socket.emit('updateRounds', rounds);
-}
-
-function checkEndGame() {
-    let searchQuery = window.location.search.substring(1);
-    params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
-    socket.emit('checkEndGame', params);
-}
-
-socket.on('newRounds', (newRounds) => {
-    rounds = newRounds;
-    console.log(rounds);
-    timerStart();
-})
-function timerStart() {
-
-    if(rounds == 0) {
-        let a = setInterval(function () {
-            timer.innerHTML -= 1;
-            if(timer.innerHTML == 0) {
-                clearInterval(a);
-                timer.innerHTML = 5;
-                startRoundKiller();
-            }
-        }, 1000);
-    }
-    else if(rounds == 1) {
-        let b = setInterval(function () {
-            timer.innerHTML -= 1;
-            if(timer.innerHTML == 0) {
-                clearInterval(b);
-                timer.innerHTML = 5;
-                startRoundMedic();
-            }
-        }, 1000);
-    }
-    else if(rounds == 2) {
-        let c = setInterval(function () {
-            timer.innerHTML -= 1;
-            if(timer.innerHTML == 0) {
-                clearInterval(c);
-                timer.innerHTML = 10;
-                startRoundPassanger();
-            }
-        }, 1000);
-    }
-    else if(rounds == 3) {
-        let d = setInterval(function () {
-            timer.innerHTML -= 1;
-            if(timer.innerHTML == 0) {
-                clearInterval(d);
-                timer.innerHTML = 10;
-                endRound();
-            }
-        }, 1000)
-    }
-}
-
 function testRole() {
     let searchQuery = window.location.search.substring(1);
     params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
 
     socket.emit('testRole', params);
 }
-
-// function setParams() {
-//     let searchQuery = window.location.search.substring(1);
-//     params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
-
-//     return params;
-// }
 socket.on('testRole', (data) => {
     console.log(data);
 })

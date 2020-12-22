@@ -67,6 +67,13 @@ class Users {
         return user;
     }
 
+    resetStatus(room) {
+        let user = this.users.filter((user) => user.room === room);
+        for (let i = 0; i<user.length; i++) {
+            user[i].alive = 0;
+        }
+    }
+
     refreshVotePoints(room) {
         let users = this.users.filter((user) => user.room === room);
         for (let i = 0; i<users.length; i++) {
