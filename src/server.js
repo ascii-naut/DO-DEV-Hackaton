@@ -32,6 +32,22 @@ io.on('connection', (socket) => {
     users.removeUser(socket.id);
     users.addUser(socket.id, params.name, params.room, role, 0);
 
+    let user = users.getUser(socket.id);
+    io.to(user.room).emit('resetButtons');
+    io.to(user.room).emit('updatePlayers', users.getUserList(params.room));
+
+    // let user = users.getUser(socket.id);
+    // let allUsers = users.getUserList(params.room);
+    // if(user) {
+    //   for (let i = 0; i<allUsers.length; i++) {
+    //     if(allUsers[i].name == user.name) {
+    //       io.to(user.room).emit('removeUser', user.name);
+    //       window.location.href = "/";
+    //       console.log('user should be removed');
+    //     }
+    //   }
+    // }
+
     callback();
   })
 
@@ -45,6 +61,7 @@ io.on('connection', (socket) => {
   socket.on('startGame', (params) => {
     let user = users.addUser(socket.id, params.name, params.room);
     let allRoomUsers = users.getRoom(params.room);
+    io.to(user.room).emit('resetButtons');
     io.to(user.room).emit('updateUserList', users.getUserList(params.room));
     io.to(user.room).emit(users.updateUserListRoles(params.room));
     

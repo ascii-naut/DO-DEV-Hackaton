@@ -38,9 +38,35 @@ socket.on('removeUser', (data) => {
 function startGame() {
     let searchQuery = window.location.search.substring(1);
     params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
+    let oldPlayers = document.getElementById('startingPlayers');
+    oldPlayers.parentNode.removeChild(oldPlayers);
 
     socket.emit("startGame", params);
 }
+socket.on('updatePlayers', (users) => {
+    let players = document.getElementById('startingPlayers');
+    socket.emit('resetButtons');
+    for(let i = 0; i < users.length; i++) {
+        let playerDiv = document.createElement("DIV");
+        let playerButton = document.createElement("BUTTON");
+        let playerName = document.createElement("DIV");
+
+        playerDiv.classList.add("col");
+        playerButton.classList.add("playerButton");
+        playerName.innerHTML = users[i];
+
+        playerDiv.appendChild(playerButton);
+        playerDiv.appendChild(playerName);
+        players.appendChild(playerDiv);
+    }
+});
+socket.on('resetButtons', () => {
+    let players = document.getElementById('startingPlayers');
+    let playersCol = document.getElementById('playerCol');
+    players.innerHTML = "";
+    playersCol.innerHTML = "";
+
+})
 socket.on("updateUserList", (users) => {
     let players = document.getElementById('playerCol');
     let colors = ["#ff7e7e", "#9393ff", "#f5ff80", "#91ff8c", "#ff8cf4", "#cb8cff", "black", "#a1ffe7", "#868686"]
