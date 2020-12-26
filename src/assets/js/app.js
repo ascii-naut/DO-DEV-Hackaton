@@ -1,4 +1,8 @@
-let socket = io();
+let socket = io.connect('http://localhost:3000', {
+    reconnection: false,
+    transports: ['websocket'],
+    upgrade: false
+});
 let startButton = document.getElementById("startButton");
 let loginSection = document.getElementById("loginSection");
 let gameSection = document.getElementById("gameSection");
@@ -9,8 +13,8 @@ let allPlayers = document.getElementsByClassName('player');
 let timer = document.getElementById('timer');
 let startBtn = document.getElementById('startButton');
 
-let isDiscussion = false;
-let rounds = 0;
+let isDiscussion = true;
+let rounds = 30;
 
 roleA = "Passanger";
 
@@ -35,14 +39,16 @@ socket.on('removeUser', (data) => {
     let userButton = document.getElementById(data + "-col");
     userButton.style.display = 'none';
 })
-socket.on('disconnectPlease', () => {
-    window.location.href = "/";
-})
 function startGame() {
     let searchQuery = window.location.search.substring(1);
     params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
+
     let oldPlayers = document.getElementById('startingPlayers');
+    let storyText = document.querySelector('.storyText');
+    let nextText = document.getElementById('nextText');
     oldPlayers.parentNode.removeChild(oldPlayers);
+    storyText.parentNode.removeChild(storyText);
+    nextText.style.display = "block";
 
     socket.emit("startGame", params);
 }
@@ -75,7 +81,7 @@ socket.on("updateUserList", (users) => {
     let colors = ["#ff7e7e", "#9393ff", "#f5ff80", "#91ff8c", "#ff8cf4", "#cb8cff", "black", "#a1ffe7", "#868686"]
     startBtn.style.display = "none";
 
-    for(let i = 0; i < users.length-1; i++) {
+    for(let i = 0; i < users.length; i++) {
         let playerDiv = document.createElement("DIV");
         let playerButton = document.createElement("BUTTON");
         let playerName = document.createElement("DIV");
@@ -112,6 +118,8 @@ function showIconVote() {
     let searchQuery = window.location.search.substring(1);
     params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
     let clickedUser = this.id;
+    this.classList.remove("fa");
+    this.classList.remove('fa-user-shield');
     this.classList.add("fa");
     this.classList.add("fa-times");
     this.style.pointerEvents = "none";
@@ -129,8 +137,10 @@ function showIconHeal() {
     let searchQuery = window.location.search.substring(1);
     params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
     let clickedUser = this.id;
+    this.classList.remove("fa");
+    this.classList.remove('fa-user-shield');
     this.classList.add("fa");
-    this.classList.add("fa-heart");
+    this.classList.add("fa-laptop-medical");
     this.style.pointerEvents = "none";
     for(let a = 0; a<allPlayers.length; a++) {
         allPlayers[a].style.pointerEvents = "none";
@@ -147,6 +157,8 @@ function showIconKill() {
     let searchQuery = window.location.search.substring(1);
     params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
     let clickedUser = this.id;
+    this.classList.remove("fa");
+    this.classList.remove('fa-user-shield'); // CONTINUE FROM HERE !!!!!
     this.classList.add("fa");
     this.classList.add("fa-skull-crossbones");
     this.style.pointerEvents = "none";
@@ -157,6 +169,11 @@ function showIconKill() {
 }
 
 
+socket.on('medicIsDead', () => {
+    let medicText = document.getElementById('medicStatus');
+    medicText.innerHTML = "dead";
+    medicText.classList.add('text-danger');
+})
 
 function endRound() {
     let searchQuery = window.location.search.substring(1);
@@ -323,24 +340,37 @@ function resetStatus() {
 socket.on('updateDeadUser', (data) => {
     let a = document.getElementById(data);
     a.classList.remove('fa-skull-crossbones');
-    a.classList.remove('player');
+    a.classList.remove('fa-laptop-medical');
+    a.classList.remove('fa-user-shield');
+    a.classList.remove('fa');
+    a.classList.remove('fa-3x');
+
+
     a.classList.add('fa');
     a.classList.add('fa-3x');
     a.classList.add('fa-skull-crossbones');
+    a.classList.remove('player');
     a.style.pointerEvents = "none";
 })
 socket.on('updateVotedPlayer', (data) => {
     let a = document.getElementById(data);
     a.classList.remove('fa-times');
-    a.classList.remove('player');
+    a.classList.remove('fa-skull-crossbones');
+    a.classList.remove('fa-laptop-medical');
+    a.classList.remove('fa-user-shield');
+    a.classList.remove('fa');
+    a.classList.remove('fa-3x');
+
+
     a.classList.add('fa');
     a.classList.add('fa-3x');
     a.classList.add('fa-times');
+    a.classList.remove('player');
     a.style.pointerEvents = "none";
 })
 socket.on('alertOnDeath', () => {
     let status = document.querySelector('.status');
-    status.style.color = "red";
+    status.classList.add('text-danger');
     status.innerHTML = "dead";
 })
 socket.on('alertOnVote', () => {
@@ -353,7 +383,7 @@ socket.on('clearRoom', () => {
         allPlayers[i].classList.remove('fa');
         allPlayers[i].classList.remove('fa-3x');
         allPlayers[i].classList.remove('fa-skull-crossbones');
-        allPlayers[i].classList.remove('fa-heart');
+        allPlayers[i].classList.remove('fa-laptop-medical');
         allPlayers[i].classList.remove('fa-times');
         allPlayers[i].style.pointerEvents = "all";
     }

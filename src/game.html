@@ -18,7 +18,7 @@
     ></script>
   </head>
 
-  <body>
+  <body onload="setReload()">
     <main>
       <div id="blackScreen"></div>
       <section id="gameSection">
@@ -39,25 +39,36 @@
           <h3 style="right: 20px; top: 10px; border-left: 2px solid black; border-bottom: 2px solid black; padding: 0 0 10px 15px; position: fixed; font-weight: 800;">
             Status: <span class="status" style="color: rgb(92, 179, 92);">alive</span>
           </h3>
+          <h3 style="right: 20px; top: 70px; border-left: 2px solid black; border-bottom: 2px solid black; padding: 0 0 10px 15px; position: fixed; font-weight: 800;">
+            Medic Status: <span id="medicStatus" style="color: rgb(92, 179, 92);">alive</span>
+          </h3>
+          <h3 style="right: 20px; bottom: 10px; border-left: 2px solid black; border-top: 2px solid black; padding: 0 0 10px 15px; position: fixed; font-weight: 800;">
+            Game Status: <span id="gameStatus" style="color: rgb(255, 106, 106);">Not Started</span>
+          </h3>
           <div class="row" style="height: 100px"></div>
-          <!-- <button id="testUpdate" onclick="testRole()">Role Test</button>
+          <button id="testUpdate" onclick="testRole()">Role Test</button>
           <button id="testUpdate" onclick="endRound()">End Round</button>
-          <button id="testUpdate" onclick="refreshRound()">Refresh Round</button> -->
+          <button id="testUpdate" onclick="refreshRound()">Refresh Round</button>
           <div class="row justify-content-center" id="playerCol">
+            
 
           </div>
           <div class="row justify-content-center" id="startingPlayers">
+            
 
           </div>
-          <div class="row justify-content-center pt-5 w-50 m-auto" id="notVictory">
+          <div class="row justify-content-center pt-5 w-50 m-auto" id="notVictory">   
             <h3 class="font-weight-bold mb-4" style="font-size: 40px">
-              There's been a murder!
+              There's been a <b class="text-danger">breach</b>!
             </h3>
-            <p class="pb-5" style="font-weight: 500">
-              It was all good in the depths of the ocean. However, it seems
-              there's a psycho shark among us. Somebody with no remorse
-              whatsoever! This resulted in a murder this night. Solve the crime
-              together and put that nasty shark behind coral bars!
+            <p class="pb-5 storyText" style="font-weight: 500">
+              It was all good in the datacenter. However, it seems
+              there's a psycho hacker among us. Somebody with no remorse
+              whatsoever! This resulted in a massive breach last night. Solve the crime
+              together and put that nasty hackers behind bars. <br> Oh, and one more thing... be careful not to lock the wrong person!
+            </p>
+            <p class="pb-5" id="nextText" style="font-weight: 500; display: none;">
+              Your boss commanded all of you to do forensics to get to know the hacker more. Who could it be? Discuss together and try to find the malicious actor. The company's image and livelihood is at stake. <br> Discuss each and every small detail!
             </p>
             <span id="bottomPlayer">
               <!-- BOTTOM PLAYER HERE -->

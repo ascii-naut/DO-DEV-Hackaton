@@ -31,29 +31,18 @@ io.on('connection', (socket) => {
     socket.join(params.room)
 
     users.removeUser(socket.id);
-    users.addUser(socket.id, params.name, params.room, role, 0);
+    let user = users.addUser(socket.id, params.name, params.room, role, 0);
 
-    let user = users.getUser(socket.id);
-    let allusers = users.getUserList(params.room);
+    //let user = users.getUser(socket.id);
     let existingUser = users.getUsersFromRoom(params.room, user.name);
-    
-    for(let i = 0; i<existingUser.length; i++) {
-      if(existingUser[1]!=undefined) {
-        return callback('There is already a user with that name in the game. Please choose a different one.');
-      }
+
+    if(existingUser[1]!=undefined) {
+      users.removeUser(existingUser[1].id);
+      return callback('There is already a user with that name in the game. Please choose a different one.');
     }
-    
+
     io.to(user.room).emit('resetButtons');
     io.to(user.room).emit('updatePlayers', users.getUserList(params.room));
-
-    // let allUsers = users.getUserList(params.room);
-    // for (let i = 0; i<allUsers.length; i++) {
-    //     if(allUsers[i] == user.name && allUsers.length > 1) {
-    //       io.to(user.room).emit('removeUser', socket.id);
-    //       io.to(socket.id).emit('disconnectPlease');
-    //       console.log('user should be removed');
-    //     }
-    // }
 
     callback();
   })
@@ -62,11 +51,12 @@ io.on('connection', (socket) => {
     let user = users.removeUser(socket.id);
     if(user) {
       io.to(user.room).emit('removeUser', user.name);
+      //socket.leave(user.room);
     }
   })
 
   socket.on('startGame', (params) => {
-    let user = users.addUser(socket.id, params.name, params.room);
+    let user = users.getUser(socket.id);
     let allRoomUsers = users.getRoom(params.room);
     io.to(user.room).emit('resetButtons');
     io.to(user.room).emit('updateUserList', users.getUserList(params.room));
@@ -78,6 +68,7 @@ io.on('connection', (socket) => {
 
 
     io.to(user.room).emit('timerStart');
+
 
     updateUserCards(params);
  })
@@ -136,8 +127,8 @@ io.on('connection', (socket) => {
       if(deadUser.length >= 1) {
         for (let i = 0; i<1; i++) {
           io.to(deadUser[i].id).emit('alertOnDeath');
-          io.to(deadUser[i].room).emit('updateDeadUser', isDeadUser);
           io.to(userId.room).emit('clearRoom');
+          io.to(deadUser[i].room).emit('updateDeadUser', isDeadUser);
           deadUser[i].alive = "alreadyDead";
         }
       }
@@ -177,6 +168,7 @@ io.on('connection', (socket) => {
         }
       }
       else if (gameEnd == 2) {
+        io.to(params.room).emit('medicIsDead');
         console.log('The medic is dead and this is no good news!');
 
       }

@@ -49,16 +49,35 @@ class Users {
         role1 = "Killer";
         role2 = "Medic";
 
-        // let user = this.users[0];
-        // let user2 = this.users[1];
-        let user = this.users.filter((user) => user.room === room)[0];
-        let user2 = this.users.filter((user) => user.room === room)[1];
-        user.role = role1;
-        user2.role = role2;
-
-        // console.log(random1 + " ------ " + random2 );
-        // console.log(this.users.length);
-    }
+        if(random1!=random2) {
+            let user = this.users.filter((user) => user.room === room)[random1];
+            let user2 = this.users.filter((user) => user.room === room)[random2];
+            user.role = role1;
+            user2.role = role2;
+        }
+        else if(random1==random2 && random1==this.users.length-1 && random1>0) {
+            random1--;
+            let user = this.users.filter((user) => user.room === room)[random1];
+            let user2 = this.users.filter((user) => user.room === room)[random2];
+            user.role = role1;
+            user2.role = role2;
+        }
+        else if(random1==random2 && random1==0) {
+            random1++;
+            let user = this.users.filter((user) => user.room === room)[random1];
+            let user2 = this.users.filter((user) => user.room === room)[random2];
+            user.role = role1;
+            user2.role = role2;
+        }
+        else if(random1==random2 && random1>0 && random1<this.users.length-1) {
+            random1--;
+            let user = this.users.filter((user) => user.room === room)[random1];
+            let user2 = this.users.filter((user) => user.room === room)[random2];
+            user.role = role1;
+            user2.role = role2;
+         }
+        }
+    
 
     isAlive(playerName, status, room) {
         let user = this.users.filter((user) => user.name === playerName && user.room === room)[0];
@@ -92,7 +111,8 @@ class Users {
         let userList = this.users.filter((user) => user.room === room);
         let voteArray = [];
         let finalVote;
-        for(let i = 0; i<userList.length-1; i++) {
+        // for(let i = 0; i<userList.length-1; i++) { ########### CHECK LATER
+        for(let i = 0; i<userList.length; i++) {
             voteArray[i] = userList[i].alive;
         }
 

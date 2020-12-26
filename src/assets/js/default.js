@@ -60,6 +60,17 @@ function showRules() {
     console.log("It's working.");
 }
 
+function testThisFunction() {
+    window.alert('Yes, it is somehow working.');
+}
+
+// function setReload() {
+//     window.onbeforeunload = function(event)
+//     {
+//         return confirm("Confirm refresh");
+//     };
+// }
+
 hoverOnCard();
 // spawnBottomPlayer();
 // spawnEnemyPlayers();
