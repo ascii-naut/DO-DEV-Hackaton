@@ -13,8 +13,8 @@ let allPlayers = document.getElementsByClassName('player');
 let timer = document.getElementById('timer');
 let startBtn = document.getElementById('startButton');
 
-let isDiscussion = true;
-let rounds = 30;
+let isDiscussion = false;
+let rounds = 20;
 
 roleA = "Passanger";
 
@@ -44,11 +44,7 @@ function startGame() {
     params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
 
     let oldPlayers = document.getElementById('startingPlayers');
-    let storyText = document.querySelector('.storyText');
-    let nextText = document.getElementById('nextText');
     oldPlayers.parentNode.removeChild(oldPlayers);
-    storyText.parentNode.removeChild(storyText);
-    nextText.style.display = "block";
 
     socket.emit("startGame", params);
 }
@@ -175,25 +171,17 @@ socket.on('medicIsDead', () => {
     medicText.classList.add('text-danger');
 })
 
+socket.on('medicIsJailed', () => {
+    let medicText = document.getElementById('medicStatus');
+    medicText.innerHTML = "jailed";
+    medicText.classList.add('text-danger');
+})
+
 function endRound() {
     let searchQuery = window.location.search.substring(1);
     params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
     socket.emit('endRound', params, isDiscussion);
 }
-socket.on('gameIsEnded', () => {
-    let a = setInterval(function () {
-        let victory = document.getElementById('victory');
-        let notVictory = document.getElementById('notVictory');
-
-        notVictory.style.display = "none";
-        victory.style.display = "block";
-        clearInterval(a);
-    }, 1000);
-    let b = setInterval(function () {
-        window.location.href = "/";
-        clearInterval(b);
-    }, 5000)
-})
 function checkEndGame() {
     let searchQuery = window.location.search.substring(1);
     params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
@@ -201,6 +189,70 @@ function checkEndGame() {
 }
 
 
+socket.on('adminsWon', () => {
+    let a = setInterval(function () {
+        let victory = document.getElementById('notVictory');
+        let story = document.getElementById('nextText');
+
+        story.style.display = "none";
+
+        victory.innerHTML = "Good job team. You caught the hacker. You <b class='text-success'>WON</b>!"
+        clearInterval(a);
+    }, 1000);
+    // let b = setInterval(function () {
+    //     window.location.href = "/";
+    //     clearInterval(b);
+    // }, 5000)
+})
+
+socket.on('killerLost', () => {
+    let a = setInterval(function () {
+        let victory = document.getElementById('notVictory');
+        let story = document.getElementById('nextText');
+
+        story.style.display = "none";
+        
+
+        victory.innerHTML = "The sysadmins managed to catch you. You <b class='text-danger'>LOST</b>."
+        clearInterval(a);
+    }, 1000);
+    // let b = setInterval(function () {
+    //     window.location.href = "/";
+    //     clearInterval(b);
+    // }, 5000)
+})
+
+socket.on('killerWon', () => {
+    let a = setInterval(function () {
+        let victory = document.getElementById('notVictory');
+        let story = document.getElementById('nextText');
+
+        story.style.display = "none";
+
+        victory.innerHTML = "You are truly an outstanding mind. You managed to fool all of the sysadmins. You <b class='text-success'>WON</b>."
+        clearInterval(a);
+    }, 1000);
+    // let b = setInterval(function () {
+    //     window.location.href = "/";
+    //     clearInterval(b);
+    // }, 5000)
+})
+
+socket.on('adminsLost', () => {
+    let a = setInterval(function () {
+        let victory = document.getElementById('notVictory');
+        let story = document.getElementById('nextText');
+
+        story.style.display = "none";
+
+        victory.innerHTML = "You did your best. However, the hacker is truly evasive and you did not catch him. You <b class='text-danger'>LOST</b>."
+        clearInterval(a);
+    }, 1000);
+    // let b = setInterval(function () {
+    //     window.location.href = "/";
+    //     clearInterval(b);
+    // }, 5000)
+})
 
 
 
@@ -248,6 +300,16 @@ function startRoundPassanger() {
     }
 }
 
+socket.on('gameStatusChange', () => {
+    let gameStatus = document.getElementById('gameStatus');
+    gameStatus.innerHTML = "Started";
+    gameStatus.classList.add('text-success');
+
+    let storyText = document.querySelector('.storyText');
+    let nextText = document.getElementById('nextText');
+    storyText.parentNode.removeChild(storyText);
+    nextText.style.display = "block";
+})
 
 socket.on('timerStart', () => {
     timerStatus();

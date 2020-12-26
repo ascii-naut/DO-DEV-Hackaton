@@ -59,6 +59,7 @@ io.on('connection', (socket) => {
     let user = users.getUser(socket.id);
     let allRoomUsers = users.getRoom(params.room);
     io.to(user.room).emit('resetButtons');
+    io.to(user.room).emit('gameStatusChange');
     io.to(user.room).emit('updateUserList', users.getUserList(params.room));
     io.to(user.room).emit(users.updateUserListRoles(params.room));
     
@@ -161,16 +162,29 @@ io.on('connection', (socket) => {
   socket.on('checkEndGame', (params) => {
     let gameEnd = users.getUserRoleAndStatus(params.room);
     let usersExcept = users.getAllUsersExceptKiller(params.room);
+    let killer = users.getUserRoles("Killer", params.room);
+
       if (gameEnd == 1) {
-        console.log('The game ended because the killer is out ---> the friendly sharks won!');
         for(let i = 0; i<usersExcept.length; i++) {
-          io.to(usersExcept[i].id).emit('gameIsEnded');
+          io.to(usersExcept[i].id).emit('adminsWon');
         }
+        io.to(killer[0].id).emit('killerLost'); // HAVE TO IMPLEMENT THIS
+        console.log('The killer lost. Good job.');
       }
       else if (gameEnd == 2) {
         io.to(params.room).emit('medicIsDead');
-        console.log('The medic is dead and this is no good news!');
-
+        console.log('The medic is dead.');
+      }
+      else if(gameEnd == 3) {
+        io.to(params.room).emit('medicIsJailed');
+        console.log('The medic is jailed.');
+      }
+      else if(gameEnd == 4) {
+        for(let i = 0; i<usersExcept.length; i++) {
+          io.to(usersExcept[i].id).emit('adminsLost'); // HAVE TO IMPLEMENT
+        }
+        io.to(killer[0].id).emit('killerWon'); // HAVE TO IMPLEMENT THIS
+        console.log('The killer won. Not cool, eh?');
       }
       else if (gameEnd == null) {
         console.log('The game continues until the killer is found or all players are dead.');

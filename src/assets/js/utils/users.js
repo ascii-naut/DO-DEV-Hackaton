@@ -148,14 +148,28 @@ class Users {
         let killer = this.users.filter((user) => user.room === room && user.role === "Killer")[0];
         let medic = this.users.filter((user) => user.room === room && user.role === "Medic")[0];
 
+        let allPlayers = this.users.filter((user) => user.room === room);
+        let deadPlayers = this.users.filter((user) => user.room === room && user.alive === "alreadyDead" || user.alive === "alreadyVotedOut");
+
         if(killer.alive == 'alreadyVotedOut') {
             return 1;
+            //Killer is out and the passangers win.
         }
-        else if(medic.alive == 'alreadyVotedOut' || medic.alive == 'alreadyDead') {
+        else if(medic.alive == 'alreadyDead' && deadPlayers.length < allPlayers.length-3) {
             return 2;
+            // Medic is dead
         }
-        else if(killer.alive != 'alreadyVotedOut'){
+        else if(medic.alive == 'alreadyVotedOut' && deadPlayers.length < allPlayers.length-3) {
+            return 3;
+            // Medic is jailed
+        }
+        if(deadPlayers.length > allPlayers.length-3 && killer.alive != 'alreadyVotedOut') {
+            return 4;
+            // Killer wins
+        }
+        else if(killer.alive != 'alreadyVotedOut' && deadPlayers.length < allPlayers.length-3){
             return null;
+            // The game continues
         }
     }
 

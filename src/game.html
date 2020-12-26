@@ -48,7 +48,8 @@
           <div class="row" style="height: 100px"></div>
           <button id="testUpdate" onclick="testRole()">Role Test</button>
           <button id="testUpdate" onclick="endRound()">End Round</button>
-          <button id="testUpdate" onclick="refreshRound()">Refresh Round</button>
+          <!-- <button id="testUpdate" onclick="refreshRound()">Refresh Round</button> -->
+          <button id="testUp"onclick="checkEndGame()">Check End Game</button>
           <div class="row justify-content-center" id="playerCol">
             
 
@@ -57,11 +58,11 @@
             
 
           </div>
-          <div class="row justify-content-center pt-5 w-50 m-auto" id="notVictory">   
-            <h3 class="font-weight-bold mb-4" style="font-size: 40px">
+          <div class="row justify-content-center pt-5 w-50 m-auto">   
+            <h3 id="notVictory" class="font-weight-bold mb-4" style="font-size: 40px">
               There's been a <b class="text-danger">breach</b>!
             </h3>
-            <p class="pb-5 storyText" style="font-weight: 500">
+            <p class="pb-5 storyText" id="storyText" style="font-weight: 500">
               It was all good in the datacenter. However, it seems
               there's a psycho hacker among us. Somebody with no remorse
               whatsoever! This resulted in a massive breach last night. Solve the crime
@@ -76,11 +77,6 @@
             </span>
           </div>
 
-          <div class="row justify-content-center pt-5 w-50 m-auto" id ="victory" style="display: none;">
-            <h3 class="font-weight-bold mb-4" style="font-size: 40px">
-              You are victorious!!!!!!
-            </h3>
-          </div>
           <div class="row justify-content-center">
             <div
               id="playerCard"
