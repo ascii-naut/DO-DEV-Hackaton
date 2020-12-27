@@ -59,6 +59,8 @@ socket.on('updatePlayers', (users) => {
         playerDiv.classList.add("col");
         playerButton.classList.add("playerButton");
         playerName.innerHTML = users[i];
+        playerName.style.fontSize = "30px";
+        playerName.style.fontWeight = "800";
 
         playerDiv.appendChild(playerButton);
         playerDiv.appendChild(playerName);
@@ -88,7 +90,9 @@ socket.on("updateUserList", (users) => {
         playerButton.id = users[i];
         playerDiv.id = `${users[i]}-col`
         playerName.innerHTML = users[i];
-        playerButton.style.border = `3px solid ${colors[i]}`;
+        // playerButton.style.border = `5px solid ${colors[i]}`;
+        playerButton.style.border = `5px solid black`;
+        playerButton.style.backgroundColor = colors[i];
         playerButton.addEventListener('click', clickOnPlayer);
 
         playerDiv.appendChild(playerButton);

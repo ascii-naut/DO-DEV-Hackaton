@@ -25,31 +25,25 @@
         <div class="container text-center align-content-center">
           <h3 class="timer"
             style="
-              left: 20px;
-              top: 10px;
-              border-right: 2px solid black;
-              border-bottom: 2px solid black;
-              padding: 0 15px 10px 0px;
-              position: fixed;
-              font-weight: 800;
+              left: 20px;top: 10px;padding: 0 10px 10px 15px;border: 5px solid black;position: fixed;font-weight: 800;background-color: white;border-top-right-radius: 20px;border-bottom-left-radius: 20px;
             "
           >
             Time Left: <span id="timer" style="color: rgb(231, 68, 68);">5</span>s
           </h3>
-          <h3 style="right: 20px; top: 10px; border-left: 2px solid black; border-bottom: 2px solid black; padding: 0 0 10px 15px; position: fixed; font-weight: 800;">
+          <h3 style="right: 20px;top: 10px;padding: 0 10px 10px 15px;border: 5px solid black;position: fixed;font-weight: 800;background-color: white;border-top-right-radius: 20px;border-bottom-left-radius: 20px;">
             Status: <span class="status" style="color: rgb(92, 179, 92);">alive</span>
           </h3>
-          <h3 style="right: 20px; top: 70px; border-left: 2px solid black; border-bottom: 2px solid black; padding: 0 0 10px 15px; position: fixed; font-weight: 800;">
+          <h3 style="right: 20px;top: 70px;padding: 0 10px 10px 15px;border: 5px solid black;position: fixed;font-weight: 800;background-color: white;border-top-right-radius: 20px;border-bottom-left-radius: 20px;">
             Medic Status: <span id="medicStatus" style="color: rgb(92, 179, 92);">alive</span>
           </h3>
-          <h3 style="right: 20px; bottom: 10px; border-left: 2px solid black; border-top: 2px solid black; padding: 0 0 10px 15px; position: fixed; font-weight: 800;">
+          <h3 style="right: 20px;bottom: 10px;padding: 0 10px 10px 15px;border: 5px solid black;position: fixed;font-weight: 800;background-color: white;border-top-right-radius: 20px;border-bottom-left-radius: 20px;">
             Game Status: <span id="gameStatus" style="color: rgb(255, 106, 106);">Not Started</span>
           </h3>
           <div class="row" style="height: 100px"></div>
-          <button id="testUpdate" onclick="testRole()">Role Test</button>
-          <button id="testUpdate" onclick="endRound()">End Round</button>
+          <!-- <button id="testUpdate" onclick="testRole()">Role Test</button>
+          <button id="testUpdate" onclick="endRound()">End Round</button> -->
           <!-- <button id="testUpdate" onclick="refreshRound()">Refresh Round</button> -->
-          <button id="testUp"onclick="checkEndGame()">Check End Game</button>
+          <!-- <button id="testUp"onclick="checkEndGame()">Check End Game</button> -->
           <div class="row justify-content-center" id="playerCol">
             
 
@@ -58,22 +52,22 @@
             
 
           </div>
-          <div class="row justify-content-center pt-5 w-50 m-auto">   
+          <div class="row justify-content-center pt-5 w-50 m-auto" style="border: 7px solid black;background-color: white;border-radius: 30px;padding: 0px 40px 40px 40px; margin-top: 80px!important;">   
             <h3 id="notVictory" class="font-weight-bold mb-4" style="font-size: 40px">
               There's been a <b class="text-danger">breach</b>!
             </h3>
-            <p class="pb-5 storyText" id="storyText" style="font-weight: 500">
+            <p class="pb-4 storyText" id="storyText" style="font-weight: 500">
               It was all good in the datacenter. However, it seems
               there's a psycho hacker among us. Somebody with no remorse
               whatsoever! This resulted in a massive breach last night. Solve the crime
               together and put that nasty hackers behind bars. <br> Oh, and one more thing... be careful not to lock the wrong person!
             </p>
-            <p class="pb-5" id="nextText" style="font-weight: 500; display: none;">
+            <p class="pb-4" id="nextText" style="font-weight: 500; display: none;">
               Your boss commanded all of you to do forensics to get to know the hacker more. Who could it be? Discuss together and try to find the malicious actor. The company's image and livelihood is at stake. <br> Discuss each and every small detail!
             </p>
             <span id="bottomPlayer">
               <!-- BOTTOM PLAYER HERE -->
-              <button id="startButton" onclick="startGame()">Start Game</button>
+              <button id="startButton" class="btn btn-success" style="border: 3px solid black; border-radius: 10px; font-size: 30px;" onclick="startGame()">Start Game</button>
             </span>
           </div>
 
@@ -83,38 +77,52 @@
               style="
                 padding: 0;
                 position: fixed;
-                border-radius: 10px;
                 bottom: -200px;
+                z-index: 11;
               "
               >
               <img
-                src="assets/img/killer-card.png"
+                src="assets/img/hacker-card.png"
                 width="300"
                 height="400"
                 alt=""
                 id="killerCard"
-                style="display: none;"
+                style="display: none; border-radius: 20px;"
               />
               <img
-                src="assets/img/pixel-2.jpg"
+                src="assets/img/admin-card.png"
                 width="300"
                 height="400"
                 alt=""
                 id="medicCard"
-                style="display: none;"
+                style="display: none; border: 5px solid black; border-radius: 20px;"
               />
               <img
-                src="assets/img/pixel-1.png"
+                src="assets/img/passanger-card.png"
                 width="300"
                 height="400"
                 alt=""
                 id="passangerCard"
-                style="display: none;"
+                style="display: none; border: 5px solid black; border-radius: 20px;"
               />
           </div>
           </div>
         </div>
       </section>
+      <div style="position: fixed; top: 0; left: 0; z-index: -1">
+              <img
+                src="assets/img/night.png"
+                alt=""
+                id="passangerCard"
+                style="display: none; width: 150%; height: 100vh; filter: blur(8px); -webkit-filter: blur(8px);"
+              />
+            <img
+              src="assets/img/day.png"
+              alt=""
+              id="passangerCard"
+              style="display: block; width: 150%; height: 100vh; filter: blur(8px); -webkit-filter: blur(8px);"
+            />
+      </div>
     </main>
 
     <script
