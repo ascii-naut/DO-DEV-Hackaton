@@ -149,21 +149,39 @@ class Users {
         let allPlayers = this.users.filter((user) => user.room === room);
         let deadPlayers = this.users.filter((user) => user.room === room && user.alive === "alreadyDead" || user.alive === "alreadyVotedOut");
 
-        if(killer.alive == 'alreadyVotedOut') {
-            return 1;
-            //Killer is out and the passangers win.
-        }
-        else if(medic.alive == 'alreadyDead' && killer.alive != 'alreadyVotedOut' && deadPlayers.length < allPlayers.length-3) {
+        if(medic.alive == 'alreadyDead') {
+            if(killer.alive == 'alreadyVotedOut') {
+                return 1;
+                //Killer is out and the passangers win.
+            }
+            else if(deadPlayers.length > allPlayers.length-3 && killer.alive != 'alreadyVotedOut') {
+                return 4;
+                // Killer wins
+            }
             return 2;
             // Medic is dead
         }
-        else if(medic.alive == 'alreadyVotedOut' && deadPlayers.length < allPlayers.length-3) {
+        else if(medic.alive == 'alreadyVotedOut') {
+            if(killer.alive == 'alreadyVotedOut') {
+                return 1;
+                //Killer is out and the passangers win.
+            }
+            else if(deadPlayers.length > allPlayers.length-3 && killer.alive != 'alreadyVotedOut') {
+                return 4;
+                // Killer wins
+            }
             return 3;
             // Medic is jailed
         }
-        else if(deadPlayers.length > allPlayers.length-3 && killer.alive != 'alreadyVotedOut') {
-            return 4;
-            // Killer wins
+        else {
+            if(killer.alive == 'alreadyVotedOut') {
+                return 1;
+                //Killer is out and the passangers win.
+            }
+            else if(deadPlayers.length > allPlayers.length-3 && killer.alive != 'alreadyVotedOut') {
+                return 4;
+                // Killer wins
+            }
         }
     }
 

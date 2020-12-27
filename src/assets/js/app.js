@@ -14,7 +14,7 @@ let timer = document.getElementById('timer');
 let startBtn = document.getElementById('startButton');
 
 let isDiscussion = false;
-let rounds = 20;
+let rounds = 0;
 
 roleA = "Passanger";
 
@@ -207,10 +207,10 @@ socket.on('adminsWon', () => {
         victory.innerHTML = "Good job team. You caught the hacker. You <b class='text-success'>WON</b>!"
         clearInterval(a);
     }, 1000);
-    // let b = setInterval(function () {
-    //     window.location.href = "/";
-    //     clearInterval(b);
-    // }, 5000)
+    let b = setInterval(function () {
+        window.location.href = "/";
+        clearInterval(b);
+    }, 6000)
 })
 
 socket.on('killerLost', () => {
@@ -225,10 +225,10 @@ socket.on('killerLost', () => {
         victory.innerHTML = "The sysadmins managed to catch you. You <b class='text-danger'>LOST</b>."
         clearInterval(a);
     }, 1000);
-    // let b = setInterval(function () {
-    //     window.location.href = "/";
-    //     clearInterval(b);
-    // }, 5000)
+    let b = setInterval(function () {
+        window.location.href = "/";
+        clearInterval(b);
+    }, 6000)
 })
 
 socket.on('killerWon', () => {
@@ -242,10 +242,10 @@ socket.on('killerWon', () => {
         victory.innerHTML = "You are truly an outstanding mind. You managed to fool all of the sysadmins. You <b class='text-success'>WON</b>."
         clearInterval(a);
     }, 1000);
-    // let b = setInterval(function () {
-    //     window.location.href = "/";
-    //     clearInterval(b);
-    // }, 5000)
+    let b = setInterval(function () {
+        window.location.href = "/";
+        clearInterval(b);
+    }, 6000)
 })
 
 socket.on('adminsLost', () => {
@@ -259,10 +259,10 @@ socket.on('adminsLost', () => {
         victory.innerHTML = "You did your best. However, the hacker is truly evasive and you did not catch him. You <b class='text-danger'>LOST</b>."
         clearInterval(a);
     }, 1000);
-    // let b = setInterval(function () {
-    //     window.location.href = "/";
-    //     clearInterval(b);
-    // }, 5000)
+    let b = setInterval(function () {
+        window.location.href = "/";
+        clearInterval(b);
+    }, 6000)
 })
 
 
@@ -431,7 +431,7 @@ function timerStatus() {
                     allPlayers[i].addEventListener('click', clickOnPlayer);
                 }
                 startRoundPassanger();
-                timer.innerHTML = 20;
+                timer.innerHTML = 120;
             }
         }, 1000);
     }
@@ -442,7 +442,7 @@ function timerStatus() {
         discuss.style.display = "block";
         let b = setInterval(() => {
             timer.innerHTML -= 1;
-            if(timer.innerHTML == 10) {
+            if(timer.innerHTML == 60) {
                 let endButton = document.getElementById('endTimerButton');
                 endButton.style.display = "block";
             }
