@@ -101,6 +101,8 @@
     -webkit-filter: blur(8px);
 }
 
+
+
 @media screen and (min-width: 750px) {
     .playerCol-1 {
         top: 60px
@@ -110,6 +112,21 @@
     }
     .playerCol-3 {
         top: -20px
+    }
+    #fullGameScreen {
+        display: block;
+    }
+    #mobileFullGameScreen {
+        display: none;
+    }
+}
+
+@media screen and (max-width: 750px) {
+    #fullGameScreen {
+        display: none;
+    }
+    #mobileFullGameScreen {
+        display: block;
     }
 }
 
