@@ -12,38 +12,38 @@
       crossorigin="anonymous"
     />
     <link rel="stylesheet" href="./../assets/css/main.css" />
+    <link rel="stylesheet" href="./../assets/css/animations.css" />
     <script
       src="https://kit.fontawesome.com/16b983e4de.js"
       crossorigin="anonymous"
     ></script>
   </head>
 
-  <body onload="setReload()">
+  <body>
     <main>
       <div id="blackScreen"></div>
       <section id="gameSection">
+        <div id="jailMessage" style="display: none; font-weight: 800; font-size: 26px; position: fixed; top: 90px; left: 20px; padding-left: 20px; width: 550px; height: 50px; border: 5px solid black; background-color: rgb(255, 78, 78);">The jailed user was not the hacker</div>
+        <button onclick="endTimerRound()" id="endTimerButton" class="btn btn-dark" style="position: fixed; bottom: 80px; right: 20px; font-size: 26px; border: 5px solid black; font-weight: 700; display: none;">End Round</button>
         <div class="container text-center align-content-center">
-          <h3 class="timer"
-            style="
-              left: 20px;top: 10px;padding: 0 10px 10px 15px;border: 5px solid black;position: fixed;font-weight: 800;background-color: white;border-top-right-radius: 20px;border-bottom-left-radius: 20px;
-            "
-          >
+          <h3 class="discuss" style="display: none; font-weight: 800; font-size: 36px; position: fixed; top: 10px; left: 45%;">DISCUSS</h3>
+          <h3 class="timer">
             Time Left: <span id="timer" style="color: rgb(231, 68, 68);">5</span>s
           </h3>
-          <h3 style="right: 20px;top: 10px;padding: 0 10px 10px 15px;border: 5px solid black;position: fixed;font-weight: 800;background-color: white;border-top-right-radius: 20px;border-bottom-left-radius: 20px;">
+          <h3 id="status">
             Status: <span class="status" style="color: rgb(92, 179, 92);">alive</span>
           </h3>
-          <h3 style="right: 20px;top: 70px;padding: 0 10px 10px 15px;border: 5px solid black;position: fixed;font-weight: 800;background-color: white;border-top-right-radius: 20px;border-bottom-left-radius: 20px;">
-            Medic Status: <span id="medicStatus" style="color: rgb(92, 179, 92);">alive</span>
+          <h3 class="statusMedic">
+            Firewall Status: <span id="medicStatus" style="color: rgb(92, 179, 92);">on</span>
           </h3>
-          <h3 style="right: 20px;bottom: 10px;padding: 0 10px 10px 15px;border: 5px solid black;position: fixed;font-weight: 800;background-color: white;border-top-right-radius: 20px;border-bottom-left-radius: 20px;">
+          <h3 class="statusGame">
             Game Status: <span id="gameStatus" style="color: rgb(255, 106, 106);">Not Started</span>
           </h3>
           <div class="row" style="height: 100px"></div>
-          <!-- <button id="testUpdate" onclick="testRole()">Role Test</button>
-          <button id="testUpdate" onclick="endRound()">End Round</button> -->
-          <!-- <button id="testUpdate" onclick="refreshRound()">Refresh Round</button> -->
-          <!-- <button id="testUp"onclick="checkEndGame()">Check End Game</button> -->
+          <!-- <button id="testUpdate" onclick="testRole()">Role Test</button> -->
+          <button id="testUpdate" onclick="endRound()">End Round</button>
+          <!-- <button id="testUpdate" onclick="resetStatus()">Reset Status</button> -->
+          <button id="testUp"onclick="checkEndGame()">Check End Game</button>
           <div class="row justify-content-center" id="playerCol">
             
 
@@ -52,7 +52,7 @@
             
 
           </div>
-          <div class="row justify-content-center pt-5 w-50 m-auto" style="border: 7px solid black;background-color: white;border-radius: 30px;padding: 0px 40px 40px 40px; margin-top: 80px!important;">   
+          <div class="row justify-content-center pt-5 w-50 m-auto storyArea">   
             <h3 id="notVictory" class="font-weight-bold mb-4" style="font-size: 40px">
               There's been a <b class="text-danger">breach</b>!
             </h3>
@@ -109,20 +109,24 @@
           </div>
         </div>
       </section>
-      <div style="position: fixed; top: 0; left: 0; z-index: -1">
-              <img
-                src="assets/img/night.png"
-                alt=""
-                id="passangerCard"
-                style="display: none; width: 150%; height: 100vh; filter: blur(8px); -webkit-filter: blur(8px);"
-              />
+      <div style="position: fixed; top: 0; left: 0; z-index: -1; display: none;" id="backgroundDay">
             <img
               src="assets/img/day.png"
               alt=""
               id="passangerCard"
-              style="display: block; width: 150%; height: 100vh; filter: blur(8px); -webkit-filter: blur(8px);"
+              class="dayImage"
             />
       </div>
+      <div style="position: fixed; top: -4000px; left: 0; z-index: 1000; display: block;" id="backgroundNight">
+            <img
+              src="assets/img/night.png"
+              alt=""
+              id="passangerCard"
+              style="width: 150%; height: 100vh; filter: blur(8px); -webkit-filter: blur(8px);"
+              class="nightImage"
+            />
+      </div>
+      <button onclick="changeBackground()" class="btn btn-primary" style="position: fixed; bottom: 10px; left: 10px; border: 4px solid black; font-weight: 700;">Show Background</button>
     </main>
 
     <script

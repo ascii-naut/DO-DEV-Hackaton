@@ -61,6 +61,7 @@ socket.on('updatePlayers', (users) => {
         playerName.innerHTML = users[i];
         playerName.style.fontSize = "30px";
         playerName.style.fontWeight = "800";
+        playerName.classList.add("playerName");
 
         playerDiv.appendChild(playerButton);
         playerDiv.appendChild(playerName);
@@ -90,7 +91,9 @@ socket.on("updateUserList", (users) => {
         playerButton.id = users[i];
         playerDiv.id = `${users[i]}-col`
         playerName.innerHTML = users[i];
-        // playerButton.style.border = `5px solid ${colors[i]}`;
+        playerName.classList.add("playerName");
+        playerName.style.fontSize = "30px";
+        playerName.style.fontWeight = "800";
         playerButton.style.border = `5px solid black`;
         playerButton.style.backgroundColor = colors[i];
         playerButton.addEventListener('click', clickOnPlayer);
@@ -177,7 +180,7 @@ socket.on('medicIsDead', () => {
 
 socket.on('medicIsJailed', () => {
     let medicText = document.getElementById('medicStatus');
-    medicText.innerHTML = "jailed";
+    medicText.innerHTML = "down";
     medicText.classList.add('text-danger');
 })
 
@@ -194,6 +197,7 @@ function checkEndGame() {
 
 
 socket.on('adminsWon', () => {
+    rounds = 20
     let a = setInterval(function () {
         let victory = document.getElementById('notVictory');
         let story = document.getElementById('nextText');
@@ -210,6 +214,7 @@ socket.on('adminsWon', () => {
 })
 
 socket.on('killerLost', () => {
+    rounds = 20
     let a = setInterval(function () {
         let victory = document.getElementById('notVictory');
         let story = document.getElementById('nextText');
@@ -227,6 +232,7 @@ socket.on('killerLost', () => {
 })
 
 socket.on('killerWon', () => {
+    rounds = 20
     let a = setInterval(function () {
         let victory = document.getElementById('notVictory');
         let story = document.getElementById('nextText');
@@ -243,6 +249,7 @@ socket.on('killerWon', () => {
 })
 
 socket.on('adminsLost', () => {
+    rounds = 20
     let a = setInterval(function () {
         let victory = document.getElementById('notVictory');
         let story = document.getElementById('nextText');
@@ -260,47 +267,68 @@ socket.on('adminsLost', () => {
 
 
 
-
-
-
 function startRoundKiller() {
     let searchQuery = window.location.search.substring(1);
     params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
+    let status = document.querySelector('.status');
     socket.emit('whiteScreenKiller', params);
     socket.emit("blackScreenPassanger", params);
     socket.emit("blackScreenMedic", params);
 
     socket.emit('updateRounds');
 
-    for(let i = 0; i<allPlayers.length; i++) {
-        allPlayers[i].style.pointerEvents = "all";
+    if(status.innerHTML != 'alive') {
+        for(let i = 0; i<allPlayers.length; i++) {
+            allPlayers[i].style.pointerEvents = "none";
+        }
+    }
+    else if(status.innerHTML == 'alive') {
+        for(let i = 0; i<allPlayers.length; i++) {
+            allPlayers[i].style.pointerEvents = "all";
+        }
     }
 }
 function startRoundMedic() {
     let searchQuery = window.location.search.substring(1);
     params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
+    let status = document.querySelector('.status');
     socket.emit("blackScreenKiller", params);
     socket.emit('blackScreenPassanger', params);
     socket.emit("whiteScreenMedic", params);
     
     socket.emit('updateRounds');
 
-    for(let i = 0; i<allPlayers.length; i++) {
-        allPlayers[i].style.pointerEvents = "all";
+    if(status.innerHTML != 'alive') {
+        for(let i = 0; i<allPlayers.length; i++) {
+            allPlayers[i].style.pointerEvents = "none";
+        }
+    }
+    else if(status.innerHTML == 'alive') {
+        for(let i = 0; i<allPlayers.length; i++) {
+            allPlayers[i].style.pointerEvents = "all";
+        }
     }
 }
 
 function startRoundPassanger() {
     let searchQuery = window.location.search.substring(1);
     params = JSON.parse('{"' + decodeURI(searchQuery).replace(/&/g, '","').replace(/\+/g, ' ').replace(/=/g,'":"') + '"}');
+    let status = document.querySelector('.status');
     socket.emit("whiteScreenKiller", params);
     socket.emit('whiteScreenMedic', params);
     socket.emit("whiteScreenPassanger", params);
     
     socket.emit('updateRounds');
 
-    for(let i = 0; i<allPlayers.length; i++) {
-        allPlayers[i].style.pointerEvents = "all";
+    if(status.innerHTML != 'alive') {
+        for(let i = 0; i<allPlayers.length; i++) {
+            allPlayers[i].style.pointerEvents = "none";
+        }
+    }
+    else if(status.innerHTML == 'alive') {
+        for(let i = 0; i<allPlayers.length; i++) {
+            allPlayers[i].style.pointerEvents = "all";
+        }
     }
 }
 
@@ -325,16 +353,48 @@ socket.on('newRound', () => {
     }
     timerStatus();
 })
+socket.on('alertOnVoteNotKiller', () => {
+    let message = document.getElementById('jailMessage');
+    message.style.display = "block";
+    setTimeout(function() {
+        message.style.display = "none";
+    }, 2000)
+})
+socket.on('alertOnVoteKiller', () => {
+    let message = document.getElementById('jailMessage');
+    message.style.display = "block";
+    message.innerHTML = "Good job, you caught the hacker!"
+    message.classList.add("bg-success");
+    message.classList.add("text-light");
+    setTimeout(function() {
+        message.style.display = "none";
+    }, 2000)
+})
+socket.on('alertOnVoteMedic', () => {
+    let message = document.getElementById('jailMessage');
+    message.style.display = "block";
+    message.innerHTML = "Oh no! The firewall has been hacked."
+    message.classList.add("bg-warning");
+    message.classList.add("text-dark");
+    setTimeout(function() {
+        message.style.display = "none";
+    }, 2000)
+})
 
 function timerStatus() {
     if(rounds == 0) { // GET READY ROUND
         checkEndGame();
+        for(let i = 0; i<allPlayers.length; i++) {
+            allPlayers[i].style.pointerEvents = "none";
+        }
+        let discuss = document.querySelector('.discuss');
+        discuss.style.display = "none";
         let a = setInterval(() => {
             timer.innerHTML -= 1;
             if(timer.innerHTML == 0) {
                 clearInterval(a);
                 startRoundKiller();
-                timer.innerHTML = 5;
+                timer.innerHTML = 10;
             }
         }, 1000);
     }
@@ -352,7 +412,7 @@ function timerStatus() {
             if(timer.innerHTML == 0) {
                 clearInterval(b);
                 startRoundMedic();
-                timer.innerHTML = 5;
+                timer.innerHTML = 10;
             }
         }, 1000);
     }
@@ -371,24 +431,40 @@ function timerStatus() {
                     allPlayers[i].addEventListener('click', clickOnPlayer);
                 }
                 startRoundPassanger();
-                timer.innerHTML = 15;
+                timer.innerHTML = 20;
             }
         }, 1000);
     }
     else if(rounds == 3) { // PASSANGER ROUND
         resetStatus();
+        checkEndGame();
+        let discuss = document.querySelector('.discuss');
+        discuss.style.display = "block";
         let b = setInterval(() => {
             timer.innerHTML -= 1;
+            if(timer.innerHTML == 10) {
+                let endButton = document.getElementById('endTimerButton');
+                endButton.style.display = "block";
+            }
             if(timer.innerHTML == 0) {
                 clearInterval(b);
                 isDiscussion = true;
+                let endButton = document.getElementById('endTimerButton');
+                endButton.style.display = "none";
                 endRound();
                 socket.emit('updateRounds');
-                timer.innerHTML = 5;
+                timer.innerHTML = 10;
             }
         }, 1000);
     }
 }
+
+function endTimerRound() {
+    socket.emit('setTimerEnd');
+}
+socket.on('setTimerEnd', () => {
+    timer.innerHTML = 1;
+})
 
 
 function resetStatus() {
@@ -398,6 +474,16 @@ function resetStatus() {
 }
 
 
+function startNightShift() {
+    let nightBackground = document.getElementById('backgroundNight');
+    nightBackground.classList.remove('slideUp');
+    nightBackground.classList.add('slideDown');
+}
+function endNightShift() {
+    let nightBackground = document.getElementById('backgroundNight');
+    nightBackground.classList.remove('slideDown');
+    nightBackground.classList.add('slideUp');
+}
 
 
 
@@ -445,24 +531,36 @@ socket.on('alertOnVote', () => {
     status.innerHTML = "jailed";
 })
 socket.on('clearRoom', () => {
+    let status = document.querySelector('.status');
     for (let i = 0; i<allPlayers.length; i++) {
         allPlayers[i].classList.remove('fa');
         allPlayers[i].classList.remove('fa-3x');
         allPlayers[i].classList.remove('fa-skull-crossbones');
         allPlayers[i].classList.remove('fa-laptop-medical');
         allPlayers[i].classList.remove('fa-times');
-        allPlayers[i].style.pointerEvents = "all";
+    }
+    if(status.innerHTML != 'alive') {
+        for(let i = 0; i<allPlayers.length; i++) {
+            allPlayers[i].style.pointerEvents = "none";
+        }
+    }
+    else if(status.innerHTML == 'alive') {
+        for(let i = 0; i<allPlayers.length; i++) {
+            allPlayers[i].style.pointerEvents = "all";
+        }
     }
 })
 socket.on('blackScreen', () => {
-    let blackScreen = document.getElementById('blackScreen');
-    blackScreen.classList.remove("hideBlackScreen");
-    blackScreen.classList.add("showBlackScreen");
+    //let blackScreen = document.getElementById('blackScreen');
+    //blackScreen.classList.remove("hideBlackScreen");
+    //blackScreen.classList.add("showBlackScreen");
+    startNightShift();
 })
 socket.on('whiteScreen', () => {
-    let blackScreen = document.getElementById('blackScreen');
-    blackScreen.classList.remove("showBlackScreen");
-    blackScreen.classList.add("hideBlackScreen");
+    // let blackScreen = document.getElementById('blackScreen');
+    // blackScreen.classList.remove("showBlackScreen");
+    // blackScreen.classList.add("hideBlackScreen");
+    endNightShift();
 })
 socket.on('passangerCard', () => {
     killerCard.style.display = "none";

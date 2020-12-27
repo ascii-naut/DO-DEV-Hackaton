@@ -3,8 +3,8 @@ class Users {
         this.users = [];
     }
 
-    addUser(id, name, room, role, alive) {
-        let user = {id, name, room, role, alive};
+    addUser(id, name, room, role, alive, vote) {
+        let user = {id, name, room, role, alive, vote};
         this.users.push(user);
         return user;
     }
@@ -87,23 +87,21 @@ class Users {
 
     isVoted(playerName, room) {
         let user = this.users.filter((user) => user.name === playerName && user.room === room)[0];
-        user.alive += 1;
+        user.vote += 1;
         return user;
     }
 
     resetStatus(room) {
         let user = this.users.filter((user) => user.room === room);
         for (let i = 0; i<user.length; i++) {
-            user[i].alive = 0;
+            user[i].vote = 0;
         }
     }
 
     refreshVotePoints(room) {
-        let users = this.users.filter((user) => user.room === room);
-        for (let i = 0; i<users.length; i++) {
-            if(users[i].alive != 'alreadyVotedOut' && users[i].alive != 'alreadyDead'){
-                users[i].alive = 0;
-            }
+        let userList = this.users.filter((user) => user.room === room);
+        for (let i = 0; i<userList.length; i++) {
+            userList[i].vote = 0;
         }
     }
 
@@ -113,11 +111,11 @@ class Users {
         let finalVote;
         // for(let i = 0; i<userList.length-1; i++) { ########### CHECK LATER
         for(let i = 0; i<userList.length; i++) {
-            voteArray[i] = userList[i].alive;
+            voteArray[i] = userList[i].vote;
         }
 
         finalVote = Math.max.apply(null, voteArray);
-        let votedUser = this.users.filter((user) => user.room === room && user.alive === finalVote);
+        let votedUser = this.users.filter((user) => user.room === room && user.vote === finalVote);
 
         if(votedUser.length == 1) {
             for(let a = 0; a<votedUser.length; a++) {
@@ -125,7 +123,7 @@ class Users {
                 return votedUser[a];
             }
         }
-        else if(votedUser.length >= 1) {
+        else if(votedUser.length > 1) {
             return null;
         }
 
@@ -155,7 +153,7 @@ class Users {
             return 1;
             //Killer is out and the passangers win.
         }
-        else if(medic.alive == 'alreadyDead' && deadPlayers.length < allPlayers.length-3) {
+        else if(medic.alive == 'alreadyDead' && killer.alive != 'alreadyVotedOut' && deadPlayers.length < allPlayers.length-3) {
             return 2;
             // Medic is dead
         }
@@ -163,13 +161,9 @@ class Users {
             return 3;
             // Medic is jailed
         }
-        if(deadPlayers.length > allPlayers.length-3 && killer.alive != 'alreadyVotedOut') {
+        else if(deadPlayers.length > allPlayers.length-3 && killer.alive != 'alreadyVotedOut') {
             return 4;
             // Killer wins
-        }
-        else if(killer.alive != 'alreadyVotedOut' && deadPlayers.length < allPlayers.length-3){
-            return null;
-            // The game continues
         }
     }
 

@@ -42,6 +42,65 @@
     animation: 2s whiteScreen forwards;
 }
 
+#status {
+    top: 10px;
+    padding: 0 10px 10px 15px;
+    border: 5px solid black;
+    position: fixed;
+    font-weight: 800;
+    background-color: white;
+    border-top-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+}
+.statusMedic {
+    top: 70px;
+    padding: 0 10px 10px 15px;
+    border: 5px solid black;
+    position: fixed;
+    font-weight: 800;
+    background-color: white;
+    border-top-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+}
+
+.statusGame {
+    bottom: 10px;
+    right: 20px;
+    padding: 0 10px 10px 15px;
+    border: 5px solid black;
+    position: fixed;
+    font-weight: 800;
+    background-color: white;
+    border-top-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+}
+.timer {
+    left: 20px;
+    top: 10px;
+    padding: 0 10px 10px 15px;
+    border: 5px solid black;
+    position: fixed;
+    font-weight: 800;
+    background-color: white;
+    border-top-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+}
+.storyArea {
+    position: relative;
+    border: 7px solid black;
+    background-color: white;
+    border-radius: 30px;
+    padding: 0px 40px 40px 40px;
+    margin-top: 80px!important;
+}
+.dayImage {
+    position: relative;
+    width: 150%;
+    height: 100vh;
+    filter: blur(8px);
+    -webkit-filter: blur(8px);
+}
+
 @media screen and (min-width: 750px) {
     .playerCol-1 {
         top: 60px

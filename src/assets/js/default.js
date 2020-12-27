@@ -1,5 +1,6 @@
 let playerCard = document.getElementById('playerCard');
 let killPlayer = document.getElementsByClassName('player');
+let isBackground = false;
 
 function hoverOnCard() {
     playerCard.addEventListener('mouseenter', () => {
@@ -64,12 +65,18 @@ function testThisFunction() {
     window.alert('Yes, it is somehow working.');
 }
 
-// function setReload() {
-//     window.onbeforeunload = function(event)
-//     {
-//         return confirm("Confirm refresh");
-//     };
-// }
+function changeBackground() {
+    let background = document.getElementById('backgroundDay');
+
+    if(!isBackground) {
+        background.style.display = "block"
+        isBackground = true;
+    }
+    else if(isBackground) {
+        background.style.display = "none";
+        isBackground = false;
+    }
+}
 
 hoverOnCard();
 // spawnBottomPlayer();

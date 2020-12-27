@@ -31,7 +31,7 @@ io.on('connection', (socket) => {
     socket.join(params.room)
 
     users.removeUser(socket.id);
-    let user = users.addUser(socket.id, params.name, params.room, role, 0);
+    let user = users.addUser(socket.id, params.name, params.room, role, 0, 0);
 
     //let user = users.getUser(socket.id);
     let existingUser = users.getUsersFromRoom(params.room, user.name);
@@ -143,9 +143,18 @@ io.on('connection', (socket) => {
       if(votedPlayer != null) {
         let isVotedPlayer = votedPlayer.name;
         io.to(votedPlayer.id).emit('alertOnVote');
-        io.to(votedPlayer.room).emit('updateVotedPlayer', isVotedPlayer);
         io.to(userId.room).emit('clearRoom');
+        io.to(votedPlayer.room).emit('updateVotedPlayer', isVotedPlayer);
         votedPlayer.alive = "alreadyVotedOut";
+        if(votedPlayer.role != "Killer") {
+          io.to(userId.room).emit('alertOnVoteNotKiller');
+        }
+        if(votedPlayer.role == "Medic") {
+          io.to(userId.room).emit('alertOnVoteMedic');
+        }
+        else if(votedPlayer.role == "Killer") {
+          io.to(userId.room).emit('alertOnVoteKiller');
+        }
         users.refreshVotePoints(params.room);
       }
       else if (votedPlayer == null) {
@@ -156,7 +165,7 @@ io.on('connection', (socket) => {
   })
 
   socket.on('resetStatus', (params) => {
-    users.resetStatus(params.room);
+     users.refreshVotePoints(params.room);
   })
 
   socket.on('checkEndGame', (params) => {
@@ -168,7 +177,7 @@ io.on('connection', (socket) => {
         for(let i = 0; i<usersExcept.length; i++) {
           io.to(usersExcept[i].id).emit('adminsWon');
         }
-        io.to(killer[0].id).emit('killerLost'); // HAVE TO IMPLEMENT THIS
+        io.to(killer[0].id).emit('killerLost');
         console.log('The killer lost. Good job.');
       }
       else if (gameEnd == 2) {
@@ -181,18 +190,18 @@ io.on('connection', (socket) => {
       }
       else if(gameEnd == 4) {
         for(let i = 0; i<usersExcept.length; i++) {
-          io.to(usersExcept[i].id).emit('adminsLost'); // HAVE TO IMPLEMENT
+          io.to(usersExcept[i].id).emit('adminsLost');
         }
-        io.to(killer[0].id).emit('killerWon'); // HAVE TO IMPLEMENT THIS
+        io.to(killer[0].id).emit('killerWon');
         console.log('The killer won. Not cool, eh?');
-      }
-      else if (gameEnd == null) {
-        console.log('The game continues until the killer is found or all players are dead.');
       }
   })
 
 
-
+  socket.on('setTimerEnd', () => {
+    let thisUser = users.getUser(socket.id);
+    io.to(thisUser.room).emit('setTimerEnd');
+  })
 
   socket.on('testRole', () => {
     // let user = users.getUserList(params.room);
