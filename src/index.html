@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css"
+      integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="./../assets/css/main.css" />
+    <script
+      src="https://kit.fontawesome.com/16b983e4de.js"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+
+  <body>
+    <main>
+      <!-- Modal -->
+      <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h2 class="modal-title" id="exampleModalLabel">Rules & How-To</h2>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <h5 class="font-weight-bold">General Rules:</h5>
+              <p>The game is a murder mystery game where there are 1 hacker, 1 firewall, and the rest are sysadmins. The goal of the game is to catch the hacker through discussion after each round. If the hacker manages to hack all players, he wins. If the sysadmins manage to catch the killer throughout the game, they win.</p>
+              <h5 class="font-weight-bold">What does the rounds consist of:</h5>
+              <p>Each round consists of 4 stages:
+                <br><b>&bull; Stage 1</b> - The screen for all players, except for the hacker becomes black and he chooses his target.
+                <br><b>&bull; Stage 2</b> - The screen for all players, except for the firewall becomes black and he chooses who to deffend.
+                <br><b>&bull; Stage 3</b> - The screen for all players comes clean and the results of the hacking appears. If the firewall managed to deffend the target, nobody is hacked. If, however, the firewall does not manage to deffend the target, the avatar of the player who is hacked is marked with skull and bones and is therefore hacked. Everyone then chooses who to eject from the game, based on discussion around who the hacker is. If there is a majority of votes towards one player, he goes to jail, and is therefore ejected.
+                <br><b>&bull; Stage 4</b> - Everybody has a little time to think over what happened and the stages loop throughout the next rounds.
+              </p>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <section id="loginSection">
+        <button data-toggle="modal" data-target="#exampleModal" class="btn btn-primary pl-4 pr-4 pt-3 pb-3" style="position: fixed; top: 40%; right: 10px; font-weight: 600;">Rules</button>
+        <a href="https://github.com/ascii-naut/DO-DEV-Hackaton" target="_blank" class="btn btn-warning pl-4 pr-4 pt-3 pb-3" style="position: fixed; top: 47%; right: 10px; font-weight: 600;">GitHub Repo</a>
+        <a href="https://asciinaut.sh" target="_blank" class="btn btn-danger pl-4 pr-4 pt-3 pb-3" style="position: fixed; top: 54%; right: 10px; font-weight: 600;">Creator's blog</a>
+        <div class="container w-50">
+          <div class="row align-content-center" style="height: 80vh">
+            <div class="col justify-content-center text-center">
+              <form action="/game.html">
+              <span style="font-size: 80px">🏴‍☠️💻👨‍💻</span>
+              <h3 class="font-weight-bold" style="font-size: 58px">
+                Hackers & Admins
+              </h3>
+                <input
+                class="form-field form-control-lg w-75 m-auto p-4"
+                type="text"
+                placeholder="Room Name"
+                name="room"
+                autofocus
+              />
+              <input
+                class="form-field form-control-lg w-75 m-auto p-4"
+                type="text"
+                placeholder="Username"
+                name="name"
+                autofocus
+                style="margin-top: 10px !important"
+              />
+              <button class="btn btn-primary w-75 mt-2 p-3" id="startButton">
+                Login
+              </button>
+            </form>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+      integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+      integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js"
+      integrity="sha384-w1Q4orYjBQndcko6MimVbzY0tgp4pWB4lZ7lr30WKz0vr/aWKhXdBNmNb5D92v7s"
+      crossorigin="anonymous"
+    ></script>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script
+      src="/assets/js/app.js"
+      charset="utf-8"
+      type="text/javascript"
+    ></script>
+    <script
+      src="/assets/js/default.js"
+      charset="utf-8"
+      type="text/javascript"
+    ></script>
+    <!-- <script>
+      var socket = io();
+    </script> -->
+  </body>
+</html>

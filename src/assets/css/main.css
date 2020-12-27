@@ -1,0 +1,148 @@
+.playerCardShow {
+    animation: .5s showPlayerCard forwards;
+}
+.playerCardHide {
+    animation: .5s hidePlayerCard forwards;
+}
+
+.killPlayer {
+    transform: scale(1.2);
+    background-color: rgb(32, 32, 32);
+    color: rgb(255, 121, 121);
+}
+
+.savePlayer {
+    transform: scale(1.2);
+    background-color: rgb(226, 89, 89);
+    color: white;
+}
+
+.playerButton {
+    border: 5px solid black;
+    border-radius: 10px;
+    padding: 0;
+    width: 100px;
+    height: 100px;
+}
+
+.showBlackScreen {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    z-index: 20;
+    pointer-events: all;
+    animation: 2s blackScreen forwards;
+}
+.hideBlackScreen {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    z-index: 20;
+    pointer-events: none;
+    animation: 2s whiteScreen forwards;
+}
+
+#status {
+    top: 10px;
+    padding: 0 10px 10px 15px;
+    border: 5px solid black;
+    position: fixed;
+    font-weight: 800;
+    background-color: white;
+    border-top-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+}
+.statusMedic {
+    top: 70px;
+    padding: 0 10px 10px 15px;
+    border: 5px solid black;
+    position: fixed;
+    font-weight: 800;
+    background-color: white;
+    border-top-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+}
+
+.statusGame {
+    bottom: 10px;
+    right: 20px;
+    padding: 0 10px 10px 15px;
+    border: 5px solid black;
+    position: fixed;
+    font-weight: 800;
+    background-color: white;
+    border-top-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+}
+.timer {
+    left: 20px;
+    top: 10px;
+    padding: 0 10px 10px 15px;
+    border: 5px solid black;
+    position: fixed;
+    font-weight: 800;
+    background-color: white;
+    border-top-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+}
+.storyArea {
+    position: relative;
+    border: 7px solid black;
+    background-color: white;
+    border-radius: 30px;
+    padding: 0px 40px 40px 40px;
+    margin-top: 80px!important;
+}
+.dayImage {
+    position: relative;
+    width: 150%;
+    height: 100vh;
+    filter: blur(8px);
+    -webkit-filter: blur(8px);
+}
+
+@media screen and (min-width: 750px) {
+    .playerCol-1 {
+        top: 60px
+    }
+    .playerCol-2 {
+        top: 20px
+    }
+    .playerCol-3 {
+        top: -20px
+    }
+}
+
+@keyframes showPlayerCard {
+    0% {bottom: -250px}
+    100% {bottom: 10px}
+}
+
+@keyframes hidePlayerCard {
+    0% {bottom: 10px}
+    100% {bottom: -250px}
+}
+
+@keyframes blackScreen {
+    0% {background-color: rgba(0, 0, 0, 0);}
+    100% {background-color: black;}
+}
+
+@keyframes whiteScreen {
+    0% {background-color: rgb(0, 0, 0);}
+    100% {background-color: rgba(0, 0, 0, 0);}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
