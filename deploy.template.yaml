@@ -1,0 +1,12 @@
+spec:
+  name: hackers-vs-admins
+  services:
+  - name: web
+    git:
+      branch: main
+      repo_clone_url: https://github.com/ascii-naut/DO-DEV-Hackaton
+    run_command: npm start
+    envs:
+    - key: APP_URL
+      scope: RUN_TIME
+      value: https://testwebsite.com

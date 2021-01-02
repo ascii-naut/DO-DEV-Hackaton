@@ -1,4 +1,4 @@
-let socket = io.connect('https://devtectives.asciinaut.sh', {
+let socket = io.connect(`${APP_URL}`, {
     reconnection: false,
     transports: ['websocket'],
     upgrade: false
