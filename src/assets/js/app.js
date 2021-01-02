@@ -1,4 +1,4 @@
-let socket = io.connect(`${process.env.APP_URL}`, {
+let socket = io.connect(process.env.APP_URL, {
     reconnection: false,
     transports: ['websocket'],
     upgrade: false
