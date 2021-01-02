@@ -1,4 +1,4 @@
-let socket = io.connect('https://localhost', {
+let socket = io.connect('https://localhost:3000', {
     reconnection: false,
     transports: ['websocket'],
     upgrade: false
