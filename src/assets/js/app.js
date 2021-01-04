@@ -1,4 +1,8 @@
-let socket = io.connect(process.env.APP_URL, {
+let url = window.location.href;
+const {hostname} = new URL(url);
+console.log(hostname);
+
+let socket = io.connect(`https://${hostname}:3000`, {
     reconnection: false,
     transports: ['websocket'],
     upgrade: false
