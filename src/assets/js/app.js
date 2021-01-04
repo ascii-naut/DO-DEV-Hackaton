@@ -1,8 +1,8 @@
 let url = window.location.href;
 const {hostname} = new URL(url);
-console.log(hostname);
+console.log(`https://${hostname}`);
 
-let socket = io.connect(`https://${hostname}:3000`, {
+let socket = io.connect(`https://${hostname}`, {
     reconnection: false,
     transports: ['websocket'],
     upgrade: false
